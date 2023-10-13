@@ -40,5 +40,4 @@ public class Card {
 //    @ElementCollection(fetch = FetchType.LAZY)
 //    private List<Phrase> phraseList;
 
-
 }

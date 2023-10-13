@@ -33,50 +33,27 @@ public class PhraseGrid extends VerticalLayout {
         Grid.Column<Phrase> localPhraseColumn = grid
                 .addColumn(Phrase::getLocalPhrase)
                 .setHeader("Local")
-                .setWidth("120px")
+                .setWidth("300px")
                 .setFlexGrow(0);
 
         Grid.Column<Phrase> foreignPhraseColumn = grid
                 .addColumn(Phrase::getForeignPhrase)
                 .setHeader("Foreig")
-                .setWidth("120px")
-                //.setFlexGrow(0)
-                ;
-
-        Grid.Column<Phrase> examColumn = grid
-                .addColumn(unused -> "")
-                .setHeader("Exam")
                 .setWidth("300px")
                 //.setFlexGrow(0)
                 ;
 
-        Grid.Column<Phrase> actionsColumn = grid.addComponentColumn(phrase -> {
+        Grid.Column<Phrase> examColumn = grid
+                .addColumn(Phrase::getPhraseExam)
+                .setHeader("Local")
+                .setWidth("300px")
+                //.setFlexGrow(0)
+                ;
 
-            Button editButton = new Button("Edit");
-            editButton.addClickListener(e -> {
-                if (editor.isOpen())
-                    editor.cancel();
-                grid.getEditor().editItem(phrase);
-            });
-
-            Button examButton = new Button("Check");
-            editButton.addClickListener(e -> {
-                TextField foreign = (TextField) foreignPhraseColumn.getEditorComponent();
-                System.out.println("### foreign=" + foreign.getValue());
-                TextField exam = (TextField) examColumn.getEditorComponent();
-                System.out.println("### exam=" + exam.getValue());
-                if(foreign.getValue().trim().equals(exam.getValue().trim())){
-                    System.out.println("### exam OK!");
-                }else {
-                    foreign.getStyle().set("background-color", "#FFC0CB");
-                }
-            });
-
-            HorizontalLayout reviewActions = new HorizontalLayout(editButton, examButton);
-            reviewActions.setPadding(false);
-
-            return reviewActions;
-        }).setWidth("200px").setFlexGrow(0);
+        Grid.Column<Phrase> actionsColumn = grid
+                .addColumn(unused -> "")
+                .setWidth("200px")
+                .setFlexGrow(0);
 
         editor.setBinder(binder);
         editor.setBuffered(true);
@@ -98,23 +75,60 @@ public class PhraseGrid extends VerticalLayout {
 
         TextField examField = new TextField();
         examField.setWidthFull();
+        binder.forField(examField)
+                .withStatusLabel(examValidationMessage)
+                .bind(Phrase::getPhraseExam, Phrase::setPhraseExam);
         examColumn.setEditorComponent(examField);
 
-        Button saveButton = new Button(
-                "Save",
-                e -> {
-                    editor.save();
-                    grid.getListDataView().refreshAll();
-                    editor.closeEditor();
-                });
 
-        Button cancelButton = new Button(
-                VaadinIcon.CLOSE.create(),
-                e -> editor.cancel());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
-                ButtonVariant.LUMO_ERROR);
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (editor.isOpen()) {
+                editor.save();
+                grid.getListDataView().refreshAll();
+            }
 
-        HorizontalLayout editorActions = new HorizontalLayout(saveButton, cancelButton);
+            grid.getEditor().editItem(event.getValue());
+            examField.setValue("");
+        });
+
+//        Button saveButton = new Button(
+//                "Save",
+//                e -> {
+//                    editor.save();
+//                    grid.getListDataView().refreshAll();
+//                    editor.closeEditor();
+//                });
+//
+//        Button cancelButton = new Button(
+//                VaadinIcon.CLOSE.create(),
+//                e -> editor.cancel());
+//        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
+//                ButtonVariant.LUMO_ERROR);
+
+//        HorizontalLayout editorActions = new HorizontalLayout(saveButton, cancelButton);
+//        editorActions.setPadding(false);
+//        actionsColumn.setEditorComponent(editorActions);
+
+        Button examButton = new Button("Check");
+        examButton.addClickListener(e -> {
+
+            TextField foreign = (TextField) foreignPhraseColumn.getEditorComponent();
+            System.out.println("### foreign=" + foreign.getValue());
+
+            TextField exam = (TextField) examColumn.getEditorComponent();
+            System.out.println("### exam=" + exam.getValue());
+
+            String currentForeignBackgroundColour = foreign.getStyle().get("background-color");
+
+            if (foreign.getValue().trim().equals(exam.getValue().trim())) {
+                System.out.println("### exam OK!");
+                exam.getStyle().set("background-color", currentForeignBackgroundColour);
+            } else {
+                exam.getStyle().set("background-color", "#FFC0CB");
+            }
+        });
+
+        HorizontalLayout editorActions = new HorizontalLayout(examButton);
         editorActions.setPadding(false);
         actionsColumn.setEditorComponent(editorActions);
 
