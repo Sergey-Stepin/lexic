@@ -1,23 +1,26 @@
-package services.stepin.home.lexic.ui.buffered;
+package services.stepin.home.lexic.ui.phrase;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.renderer.TextRenderer;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
+import com.vaadin.flow.data.binder.ValueContext;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.Route;
+import lombok.Getter;
+import org.springframework.util.StringUtils;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.ui.person.DataService;
 import services.stepin.home.lexic.ui.person.ValidationMessage;
 
 import java.util.List;
 
-@Route("phrase")
+
 public class PhraseGrid extends VerticalLayout {
 
     private final Grid<Phrase> grid = new Grid<>(Phrase.class, false);
@@ -25,27 +28,26 @@ public class PhraseGrid extends VerticalLayout {
     private final Binder<Phrase> binder = new Binder<>(Phrase.class);
     private final ValidationMessage localPhraseValidationMessage = new ValidationMessage();
     private final ValidationMessage foreignPhraseValidationMessage = new ValidationMessage();
-
     private final ValidationMessage examValidationMessage = new ValidationMessage();
 
     public PhraseGrid() {
 
         Grid.Column<Phrase> localPhraseColumn = grid
                 .addColumn(Phrase::getLocalPhrase)
-                .setHeader("Local")
+                //.setHeader("Local")
                 .setWidth("300px")
                 .setFlexGrow(0);
 
         Grid.Column<Phrase> foreignPhraseColumn = grid
                 .addColumn(Phrase::getForeignPhrase)
-                .setHeader("Foreig")
+                //.setHeader("Foreig")
                 .setWidth("300px")
                 //.setFlexGrow(0)
                 ;
 
         Grid.Column<Phrase> examColumn = grid
                 .addColumn(Phrase::getPhraseExam)
-                .setHeader("Local")
+                //.setHeader("Local")
                 .setWidth("300px")
                 //.setFlexGrow(0)
                 ;
@@ -80,8 +82,21 @@ public class PhraseGrid extends VerticalLayout {
                 .bind(Phrase::getPhraseExam, Phrase::setPhraseExam);
         examColumn.setEditorComponent(examField);
 
+//        binder.withValidator(Validator.from(
+//                phrase -> {
+//
+//                    if (!StringUtils.hasText(phrase.getLocalPhrase()))
+//                        return false;
+//
+//                    if (!StringUtils.hasText(phrase.getForeignPhrase()))
+//                        return false;
+//
+//                    return true;
+//                },
+//                ctx -> "Phase is invalid"));
 
         grid.asSingleSelect().addValueChangeListener(event -> {
+            binder.validate();
             if (editor.isOpen()) {
                 editor.save();
                 grid.getListDataView().refreshAll();
@@ -90,6 +105,8 @@ public class PhraseGrid extends VerticalLayout {
             grid.getEditor().editItem(event.getValue());
             examField.setValue("");
         });
+
+        grid.asSingleSelect().setRequiredIndicatorVisible(true);
 
 //        Button saveButton = new Button(
 //                "Save",
@@ -144,6 +161,24 @@ public class PhraseGrid extends VerticalLayout {
         getThemeList().clear();
         getThemeList().add("spacing-s");
         add(grid, localPhraseValidationMessage, foreignPhraseValidationMessage, examValidationMessage);
+    }
+
+    public void addPhrase(Phrase phrase) {
+
+        System.out.println("### ADD:" + phrase);
+
+//        if (editor.isOpen()) {
+//            editor.closeEditor();
+//        }
+
+        grid.asSingleSelect().clear();
+
+
+        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        listDataProvider.getItems().add(phrase);
+        listDataProvider.refreshAll();
+
+        grid.select(phrase);
     }
 
 }

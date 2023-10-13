@@ -144,7 +144,4 @@ public class CardsView extends VerticalLayout {
         cardForm.setVisible(false);
         removeClassName("editing-class");
     }
-
-
-
 }
