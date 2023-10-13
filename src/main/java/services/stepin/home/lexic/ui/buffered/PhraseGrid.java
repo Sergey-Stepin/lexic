@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.Route;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.ui.person.DataService;
@@ -46,29 +47,18 @@ public class PhraseGrid extends VerticalLayout {
                 .setHeader("Foreig")
                 .setWidth("120px").setFlexGrow(0);
 
+
+
         Grid.Column<Phrase> editColumn = grid.addComponentColumn(phrase -> {
 
-            Button editButton = new Button("Edit");
-            editButton.addClickListener(e -> {
-                if (editor.isOpen())
-                    editor.cancel();
-                grid.getEditor().editItem(phrase);
-            });
+//            Button editButton = new Button("Edit");
+//            editButton.addClickListener(e -> {
+//                if (editor.isOpen())
+//                    editor.cancel();
+//                grid.getEditor().editItem(phrase);
+//            });
 
-            Button examButton = new Button("Check");
-            editButton.addClickListener(e -> {
-                TextField foreign = (TextField) foreignPhraseColumn.getEditorComponent();
-                System.out.println("### foreign=" + foreign.getValue());
-                TextField exam = (TextField) examColumn.getEditorComponent();
-                System.out.println("### exam=" + exam.getValue());
-                if(foreign.getValue().trim().equals(exam.getValue().trim())){
-                    System.out.println("### exam OK!");
-                }else {
-                    foreign.getStyle().set("background-color", "#FFC0CB");
-                }
-            });
-
-            HorizontalLayout reviewActions = new HorizontalLayout(editButton, examButton);
+            HorizontalLayout reviewActions = new HorizontalLayout();
             reviewActions.setPadding(false);
 
             return reviewActions;
@@ -99,6 +89,31 @@ public class PhraseGrid extends VerticalLayout {
                 .bind(Phrase::getPhraseExam, Phrase::setPhraseExam);
         examColumn.setEditorComponent(examField);
 
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (editor.isOpen())
+                editor.cancel();
+            grid.getEditor().editItem(event.getValue());
+        });
+
+
+        Button examButton = new Button("Check");
+        examButton.addClickListener(e -> {
+
+            TextField foreign = (TextField) foreignPhraseColumn.getEditorComponent();
+            System.out.println("### foreign=" + foreign.getValue());
+
+            TextField exam = (TextField) examColumn.getEditorComponent();
+            System.out.println("### exam=" + exam.getValue());
+
+            if(foreign.getValue().trim().equals(exam.getValue().trim())){
+                System.out.println("### exam OK!");
+                String currentForeignBackgroundColor = foreign.getStyle().get("background-color");
+                exam.getStyle().set("background-color", currentForeignBackgroundColor);
+            }else {
+                exam.getStyle().set("background-color", "#FFC0CB");
+            }
+        });
+
         Button saveButton = new Button(
                 "Save",
                 e -> {
@@ -113,7 +128,7 @@ public class PhraseGrid extends VerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
                 ButtonVariant.LUMO_ERROR);
 
-        HorizontalLayout editorActions = new HorizontalLayout(saveButton, cancelButton);
+        HorizontalLayout editorActions = new HorizontalLayout(examButton, saveButton, cancelButton);
         editorActions.setPadding(false);
         editColumn.setEditorComponent(editorActions);
 
