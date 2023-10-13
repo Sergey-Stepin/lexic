@@ -21,9 +21,6 @@ public class Phrase {
 
     private String foreignPhrase;
 
-    @Transient
-    private String phraseExam;
-
     public Phrase(LanguageCode languageCode, String localPhrase, String foreignPhrase) {
         this.languageCode = languageCode;
         this.localPhrase = localPhrase;

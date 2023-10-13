@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.Route;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.ui.person.DataService;
@@ -39,14 +40,17 @@ public class PhraseGrid extends VerticalLayout {
                 .addColumn(Phrase::getForeignPhrase)
                 .setHeader("Foreig")
                 .setWidth("120px")
-                .setFlexGrow(0);
+                //.setFlexGrow(0)
+                ;
 
         Grid.Column<Phrase> examColumn = grid
-                .addColumn(Phrase::getPhraseExam)
-                .setHeader("Foreig")
-                .setWidth("120px").setFlexGrow(0);
+                .addColumn(unused -> "")
+                .setHeader("Exam")
+                .setWidth("300px")
+                //.setFlexGrow(0)
+                ;
 
-        Grid.Column<Phrase> editColumn = grid.addComponentColumn(phrase -> {
+        Grid.Column<Phrase> actionsColumn = grid.addComponentColumn(phrase -> {
 
             Button editButton = new Button("Edit");
             editButton.addClickListener(e -> {
@@ -94,9 +98,6 @@ public class PhraseGrid extends VerticalLayout {
 
         TextField examField = new TextField();
         examField.setWidthFull();
-        binder.forField(examField)
-                .withStatusLabel(examValidationMessage)
-                .bind(Phrase::getPhraseExam, Phrase::setPhraseExam);
         examColumn.setEditorComponent(examField);
 
         Button saveButton = new Button(
@@ -115,11 +116,12 @@ public class PhraseGrid extends VerticalLayout {
 
         HorizontalLayout editorActions = new HorizontalLayout(saveButton, cancelButton);
         editorActions.setPadding(false);
-        editColumn.setEditorComponent(editorActions);
+        actionsColumn.setEditorComponent(editorActions);
 
         editor.addCancelListener(e -> {
             localPhraseValidationMessage.setText("");
             foreignPhraseValidationMessage.setText("");
+            examValidationMessage.setText("");
         });
 
         List<Phrase> people = DataService.getPhrases();
