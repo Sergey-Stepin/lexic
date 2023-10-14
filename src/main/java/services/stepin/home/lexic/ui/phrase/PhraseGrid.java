@@ -20,6 +20,8 @@ import services.stepin.home.lexic.ui.person.ValidationMessage;
 
 import java.util.List;
 
+import static com.vaadin.flow.component.grid.Grid.SelectionMode.SINGLE;
+
 
 public class PhraseGrid extends VerticalLayout {
 
@@ -96,16 +98,26 @@ public class PhraseGrid extends VerticalLayout {
 //                ctx -> "Phase is invalid"));
 
         grid.asSingleSelect().addValueChangeListener(event -> {
-            binder.validate();
+
+            System.out.println("### editor.isOpen()=" + editor.isOpen());
             if (editor.isOpen()) {
                 editor.save();
-                grid.getListDataView().refreshAll();
             }
 
-            grid.getEditor().editItem(event.getValue());
+            Phrase phrase = event.getValue();
+            if(phrase == null){
+                System.out.println("### editor.isOpen()=" + editor.isOpen());
+            }else {
+                editor.editItem(phrase);
+            }
+
             examField.setValue("");
+
+            grid.getListDataView().refreshAll();
         });
 
+        grid.setSelectionMode(SINGLE);
+        //grid.asMultiSelect().setEnabled(false);
         grid.asSingleSelect().setRequiredIndicatorVisible(true);
 
 //        Button saveButton = new Button(
@@ -145,7 +157,13 @@ public class PhraseGrid extends VerticalLayout {
             }
         });
 
-        HorizontalLayout editorActions = new HorizontalLayout(examButton);
+        Button removeButton = new Button("Remove");
+        removeButton.addClickListener(event -> {
+            Phrase selectedPhrase = grid.asSingleSelect().getValue();
+            removePhrase(selectedPhrase);
+        });
+
+        HorizontalLayout editorActions = new HorizontalLayout(examButton, removeButton);
         editorActions.setPadding(false);
         actionsColumn.setEditorComponent(editorActions);
 
@@ -173,12 +191,21 @@ public class PhraseGrid extends VerticalLayout {
 
         grid.asSingleSelect().clear();
 
-
         var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
         listDataProvider.getItems().add(phrase);
         listDataProvider.refreshAll();
 
         grid.select(phrase);
+    }
+
+    public void removePhrase(Phrase phrase){
+
+        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        listDataProvider.getItems().remove(phrase);
+        listDataProvider.refreshAll();
+
+        grid.asSingleSelect().clear();
+
     }
 
 }
