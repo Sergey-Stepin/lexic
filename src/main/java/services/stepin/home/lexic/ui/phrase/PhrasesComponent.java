@@ -3,7 +3,6 @@ package services.stepin.home.lexic.ui.phrase;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,15 +10,14 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import services.stepin.home.lexic.model.Phrase;
 
 @Route("phrase")
-public class PhrasesForm extends VerticalLayout {
+public class PhrasesComponent extends VerticalLayout {
 
     private final PhraseGrid phraseGrid = new PhraseGrid();
 
-    public PhrasesForm() {
+    public PhrasesComponent() {
 
         add(createToolbar());
         add(phraseGrid);
-
     }
 
     private Component createToolbar() {

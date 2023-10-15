@@ -23,7 +23,7 @@ import static services.stepin.home.lexic.model.LanguageCode.DE;
 
 @Route(value = "lexic")
 @PageTitle("Lexic | cards")
-public class CardsView extends VerticalLayout {
+public class CardsList extends VerticalLayout {
 
     private final CardService cardService;
 
@@ -34,7 +34,7 @@ public class CardsView extends VerticalLayout {
     private Grid<Card> cardsGrid;
     private CardForm cardForm;
 
-    public CardsView(CardService cardService) {
+    public CardsList(CardService cardService) {
 
         this.cardService = cardService;
 
@@ -85,11 +85,11 @@ public class CardsView extends VerticalLayout {
         Grid<Card> cardsGrid = new Grid<>(Card.class);
 
         cardsGrid.addClassName("card-grid-class");
-        cardsGrid.setSizeFull();
+        //cardsGrid.setSizeFull();
 
         cardsGrid.setColumns("localWord", "languageCode", "repetitionFrequency");
 
-        cardsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
+        //cardsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
 
@@ -99,7 +99,7 @@ public class CardsView extends VerticalLayout {
     private CardForm createCardForm() {
 
         CardForm cardForm = new CardForm(LANGUAGE_CODES, REPETITION_FREQUENCIES);
-        cardForm.setWidth("25em");
+        //cardForm.setWidth("25em");
 
         cardForm.addSaveListener(this::saveCard);
         cardForm.addDeleteListener(this::deleteCard);

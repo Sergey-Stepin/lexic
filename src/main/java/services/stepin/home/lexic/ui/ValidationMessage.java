@@ -1,4 +1,4 @@
-package services.stepin.home.lexic.ui.card;
+package services.stepin.home.lexic.ui;
 
 import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.html.Span;

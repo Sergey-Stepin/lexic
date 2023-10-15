@@ -2,23 +2,22 @@ package services.stepin.home.lexic.ui.card;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.shared.Registration;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
+import services.stepin.home.lexic.ui.phrase.PhrasesComponent;
 
 import java.util.List;
 
@@ -28,43 +27,53 @@ import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
 
 public class CardForm extends FormLayout {
 
+    private final List<LanguageCode> languageCodes;
+    private final List<RepetitionFrequency> repetitionFrequencies;
     private final Binder<Card> cardBinder = new BeanValidationBinder<>(Card.class);
-
     private final Button save = new Button("Save");
     private final Button delete = new Button("Delete");
     private final Button cancel = new Button("Cancel");
-
     private final ComboBox<LanguageCode> languageCode = new ComboBox<>("Language");
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
-
-    private TextField localWord = new TextField("Local");
+    private final TextField localWord = new TextField("Local");
+    private final PhrasesComponent phrasesComponent = new PhrasesComponent();
 
     private Card card;
 
-    private Grid<String> foreignWords = new Grid<>(String.class, false);
-    private Binder binder = new BeanValidationBinder<>(String.class);
-
     public CardForm(List<LanguageCode> languageCodes, List<RepetitionFrequency> repetitionFrequencies) {
 
+        this.languageCodes = languageCodes;
+        this.repetitionFrequencies = repetitionFrequencies;
+
         addClassName("card-form-class");
+
         cardBinder.bindInstanceFields(this);
 
-        add(localWord);
+        Component content = createContent();
+        Component toolBar = createToolbar();
+
+        VerticalLayout layout = new VerticalLayout(content, toolBar);
+        add(layout);
+    }
+
+    private Component createContent() {
 
         languageCode.setItems(languageCodes);
-        add(languageCode);
-
         repetitionFrequency.setItems(repetitionFrequencies);
-        add(repetitionFrequency);
-
-        addForeignWordsGrid();
-        addButtonsLayout();
 
         languageCode.setValue(DE);
         repetitionFrequency.setValue(DAYLY);
+
+        VerticalLayout contentLayout = new VerticalLayout();
+        contentLayout.add(localWord);
+        contentLayout.add(phrasesComponent);
+        contentLayout.add(languageCode);
+        contentLayout.add(repetitionFrequency);
+
+        return contentLayout;
     }
 
-    private void addButtonsLayout() {
+    private Component createToolbar() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -78,14 +87,8 @@ public class CardForm extends FormLayout {
 
         HorizontalLayout buttonLayout = new HorizontalLayout(save, delete, cancel);
         add(buttonLayout);
-    }
 
-    private void addForeignWordsGrid() {
-
-        var editor = foreignWords.getEditor();
-        editor.setBinder(binder);
-        editor.setBuffered(false);
-        add(foreignWords);
+        return buttonLayout;
     }
 
     public void setCard(Card card) {
