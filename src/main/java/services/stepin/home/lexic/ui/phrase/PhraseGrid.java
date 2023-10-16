@@ -12,6 +12,8 @@ import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.ui.person.DataService;
 import services.stepin.home.lexic.ui.person.ValidationMessage;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.vaadin.flow.component.grid.Grid.SelectionMode.SINGLE;
@@ -167,8 +169,8 @@ public class PhraseGrid extends VerticalLayout {
             examValidationMessage.setText("");
         });
 
-        List<Phrase> people = DataService.getPhrases();
-        grid.setItems(people);
+//        List<Phrase> phrases = new ArrayList<>();
+//        grid.setItems(phrases);
 
         getThemeList().clear();
         getThemeList().add("spacing-s");
@@ -200,6 +202,17 @@ public class PhraseGrid extends VerticalLayout {
 
         grid.asSingleSelect().clear();
 
+    }
+
+    public void setPhrases(Collection<Phrase> phrases){
+        ListDataProvider<Phrase> dataProvider = new ListDataProvider<>(phrases);
+        grid.setDataProvider(dataProvider);
+        dataProvider.refreshAll();
+    }
+
+    public Collection<Phrase> getPhrases(){
+        ListDataProvider<Phrase> dataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        return dataProvider.getItems();
     }
 
 }

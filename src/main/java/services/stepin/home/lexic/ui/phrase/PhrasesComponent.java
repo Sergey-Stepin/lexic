@@ -33,4 +33,7 @@ public class PhrasesComponent extends VerticalLayout {
         return toolBar;
     }
 
+    public PhraseGrid getPhraseGrid() {
+        return phraseGrid;
+    }
 }

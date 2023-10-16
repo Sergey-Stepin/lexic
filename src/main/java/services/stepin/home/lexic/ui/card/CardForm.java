@@ -92,12 +92,17 @@ public class CardForm extends FormLayout {
     }
 
     public void setCard(Card card) {
+
         this.card = card;
         cardBinder.readBean(card);
+
+        if(card != null)
+            this.phrasesComponent.getPhraseGrid().setPhrases(card.getPhraseList());
     }
 
     private void validateAndSave() {
         try {
+            card.setPhraseList(this.phrasesComponent.getPhraseGrid().getPhrases().stream().toList());
             cardBinder.writeBean(card);
             fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
         } catch (ValidationException e) {
