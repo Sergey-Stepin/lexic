@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.apache.commons.compress.utils.Sets;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
@@ -37,8 +34,8 @@ public class Card {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> foreignWords;
 
-//    @ElementCollection(fetch = FetchType.LAZY)
-//    private List<Phrase> phraseList;
+    @ElementCollection(fetch = FetchType.EAGER)
 
+    private List<Phrase> phraseList = new ArrayList<>();
 
 }
