@@ -9,7 +9,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import services.stepin.home.lexic.model.Phrase;
 
-@Route("phrase")
 public class PhrasesComponent extends VerticalLayout {
 
     private final PhraseGrid phraseGrid = new PhraseGrid();
@@ -36,4 +35,5 @@ public class PhrasesComponent extends VerticalLayout {
     public PhraseGrid getPhraseGrid() {
         return phraseGrid;
     }
+
 }

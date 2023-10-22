@@ -81,28 +81,13 @@ public class PhraseGrid extends VerticalLayout {
                 .bind(Phrase::getPhraseExam, Phrase::setPhraseExam);
         examColumn.setEditorComponent(examField);
 
-//        binder.withValidator(Validator.from(
-//                phrase -> {
-//
-//                    if (!StringUtils.hasText(phrase.getLocalPhrase()))
-//                        return false;
-//
-//                    if (!StringUtils.hasText(phrase.getForeignPhrase()))
-//                        return false;
-//
-//                    return true;
-//                },
-//                ctx -> "Phase is invalid"));
 
         grid.asSingleSelect().addValueChangeListener(event -> {
 
             System.out.println("### editor.isOpen()=" + editor.isOpen());
-            if (editor.isOpen()) {
-                editor.save();
-            }
 
             Phrase phrase = event.getValue();
-            if(phrase != null){
+            if (phrase != null) {
                 editor.editItem(phrase);
             }
 
@@ -111,31 +96,9 @@ public class PhraseGrid extends VerticalLayout {
             grid.getListDataView().refreshAll();
         });
 
-        grid.addFocusListener(event -> {
-            System.out.println("FOCUS: " + event.getClass());
-        });
-
         grid.setSelectionMode(SINGLE);
         //grid.asMultiSelect().setEnabled(false);
         grid.asSingleSelect().setRequiredIndicatorVisible(true);
-
-//        Button saveButton = new Button(
-//                "Save",
-//                e -> {
-//                    editor.save();
-//                    grid.getListDataView().refreshAll();
-//                    editor.closeEditor();
-//                });
-//
-//        Button cancelButton = new Button(
-//                VaadinIcon.CLOSE.create(),
-//                e -> editor.cancel());
-//        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
-//                ButtonVariant.LUMO_ERROR);
-
-//        HorizontalLayout editorActions = new HorizontalLayout(saveButton, cancelButton);
-//        editorActions.setPadding(false);
-//        actionsColumn.setEditorComponent(editorActions);
 
         Button examButton = new Button("Check");
         examButton.addClickListener(e -> {
@@ -167,6 +130,9 @@ public class PhraseGrid extends VerticalLayout {
         actionsColumn.setEditorComponent(editorActions);
 
         editor.addCancelListener(e -> {
+
+            System.out.println("### CANCEL:" + e.getItem());
+
             localPhraseValidationMessage.setText("");
             foreignPhraseValidationMessage.setText("");
             examValidationMessage.setText("");
@@ -187,13 +153,10 @@ public class PhraseGrid extends VerticalLayout {
         listDataProvider.getItems().add(phrase);
         listDataProvider.refreshAll();
 
-        System.out.println("### ADDED, all: ");
-        listDataProvider.getItems().forEach(System.out::println);
-
         grid.select(phrase);
     }
 
-    public void removePhrase(Phrase phrase){
+    public void removePhrase(Phrase phrase) {
 
         var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
         listDataProvider.getItems().remove(phrase);
@@ -203,13 +166,14 @@ public class PhraseGrid extends VerticalLayout {
 
     }
 
-    public void setPhrases(Collection<Phrase> phrases){
+    public void setPhrases(Collection<Phrase> phrases) {
         ListDataProvider<Phrase> dataProvider = new ListDataProvider<>(phrases);
         grid.setDataProvider(dataProvider);
         dataProvider.refreshAll();
     }
 
-    public Collection<Phrase> getPhrases(){
+    public Collection<Phrase> getPhrases() {
+        editor.save();
         var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
         return listDataProvider.getItems();
     }

@@ -105,6 +105,8 @@ public class CardForm extends FormLayout {
 
     private void validateAndSave() {
         try {
+
+
             Collection<Phrase> prases = this.phrasesComponent.getPhraseGrid().getPhrases();
             this.card.setPhraseList(prases.stream().toList());
 
