@@ -35,6 +35,7 @@ public class Card {
     private Set<String> foreignWords;
 
     @ElementCollection(fetch = FetchType.EAGER)
+
     private List<Phrase> phraseList = new ArrayList<>();
 
 }

@@ -14,11 +14,14 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import org.hibernate.sql.ast.tree.expression.Collation;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
+import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.model.RepetitionFrequency;
 import services.stepin.home.lexic.ui.phrase.PhrasesComponent;
 
+import java.util.Collection;
 import java.util.List;
 
 import static services.stepin.home.lexic.model.LanguageCode.DE;
@@ -102,7 +105,9 @@ public class CardForm extends FormLayout {
 
     private void validateAndSave() {
         try {
-            card.setPhraseList(this.phrasesComponent.getPhraseGrid().getPhrases().stream().toList());
+            Collection<Phrase> prases = this.phrasesComponent.getPhraseGrid().getPhrases();
+            this.card.setPhraseList(prases.stream().toList());
+
             cardBinder.writeBean(card);
             fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
         } catch (ValidationException e) {

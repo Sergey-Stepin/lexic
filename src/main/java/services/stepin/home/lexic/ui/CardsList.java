@@ -114,6 +114,9 @@ public class CardsList extends VerticalLayout {
     }
 
     private void saveCard(CardFormEvent.CardFormSaveEvent event){
+
+
+
         cardService.save(event.getCard());
         updateList();
         closeEditor();

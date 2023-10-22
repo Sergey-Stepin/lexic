@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.ui.person.DataService;
@@ -101,15 +102,17 @@ public class PhraseGrid extends VerticalLayout {
             }
 
             Phrase phrase = event.getValue();
-            if(phrase == null){
-                System.out.println("### editor.isOpen()=" + editor.isOpen());
-            }else {
+            if(phrase != null){
                 editor.editItem(phrase);
             }
 
             examField.setValue("");
 
             grid.getListDataView().refreshAll();
+        });
+
+        grid.addFocusListener(event -> {
+            System.out.println("FOCUS: " + event.getClass());
         });
 
         grid.setSelectionMode(SINGLE);
@@ -178,18 +181,14 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     public void addPhrase(Phrase phrase) {
-
-        System.out.println("### ADD:" + phrase);
-
-//        if (editor.isOpen()) {
-//            editor.closeEditor();
-//        }
-
         grid.asSingleSelect().clear();
 
         var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
         listDataProvider.getItems().add(phrase);
         listDataProvider.refreshAll();
+
+        System.out.println("### ADDED, all: ");
+        listDataProvider.getItems().forEach(System.out::println);
 
         grid.select(phrase);
     }
@@ -211,8 +210,8 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     public Collection<Phrase> getPhrases(){
-        ListDataProvider<Phrase> dataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
-        return dataProvider.getItems();
+        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        return listDataProvider.getItems();
     }
 
 }
