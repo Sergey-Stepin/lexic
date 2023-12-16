@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorCancelEvent;
-import com.vaadin.flow.component.grid.editor.EditorCancelListener;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -22,11 +21,11 @@ import static com.vaadin.flow.component.grid.Grid.SelectionMode.SINGLE;
 
 public class PhraseGrid extends VerticalLayout {
 
-    private final Grid<Phrase> grid = new Grid<>(Phrase.class, false);
+    private final Grid<Phrase> phraseGrid = new Grid<>(Phrase.class, false);
     private final TextField examField = new TextField();
     private final Button examButton = new Button("Check");
     private final Button removeButton = new Button("Remove");
-    private final Editor<Phrase> editor = grid.getEditor();
+    private final Editor<Phrase> editor = phraseGrid.getEditor();
     private final Binder<Phrase> binder = new Binder<>(Phrase.class);
     private final ValidationMessage localPhraseValidationMessage = new ValidationMessage();
     private final ValidationMessage foreignPhraseValidationMessage = new ValidationMessage();
@@ -42,52 +41,53 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     public void addPhrase(Phrase phrase) {
-        grid.asSingleSelect().clear();
 
-        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        phraseGrid.getEditor().save();
+
+        var listDataProvider = (ListDataProvider<Phrase>) phraseGrid.getDataProvider();
         listDataProvider.getItems().add(phrase);
         listDataProvider.refreshAll();
 
-        grid.select(phrase);
+        phraseGrid.select(phrase);
     }
 
     public void removePhrase(Phrase phrase) {
 
-        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        var listDataProvider = (ListDataProvider<Phrase>) phraseGrid.getDataProvider();
         listDataProvider.getItems().remove(phrase);
         listDataProvider.refreshAll();
 
-        grid.asSingleSelect().clear();
+        phraseGrid.asSingleSelect().clear();
 
     }
 
     public void setPhrases(Collection<Phrase> phrases) {
         ListDataProvider<Phrase> dataProvider = new ListDataProvider<>(phrases);
-        grid.setDataProvider(dataProvider);
+        phraseGrid.setDataProvider(dataProvider);
         dataProvider.refreshAll();
     }
 
     public Collection<Phrase> getPhrases() {
         editor.save();
-        var listDataProvider = (ListDataProvider<Phrase>) grid.getDataProvider();
+        var listDataProvider = (ListDataProvider<Phrase>) phraseGrid.getDataProvider();
         return listDataProvider.getItems();
     }
 
     private Component prepareGrid() {
 
-        grid.asSingleSelect().addValueChangeListener(this::listenValueChange);
+        phraseGrid.asSingleSelect().addValueChangeListener(this::listenValueChange);
 
-        grid.setSelectionMode(SINGLE);
-        grid.asSingleSelect().setRequiredIndicatorVisible(true);
+        phraseGrid.setSelectionMode(SINGLE);
+        phraseGrid.asSingleSelect().setRequiredIndicatorVisible(true);
 
         prepareColumns();
         prepareEditor();
         
         getThemeList().clear();
         getThemeList().add("spacing-s");
-        add(grid, localPhraseValidationMessage, foreignPhraseValidationMessage, examValidationMessage);
+        add(phraseGrid, localPhraseValidationMessage, foreignPhraseValidationMessage, examValidationMessage);
 
-        return grid;
+        return phraseGrid;
     }
 
     private void prepareColumns() {
@@ -98,7 +98,7 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     private void prepareLocalPhraseColumn() {
-        localPhraseColumn = grid
+        localPhraseColumn = phraseGrid
                 .addColumn(Phrase::getLocalPhrase)
                 .setWidth("300px")
                 .setFlexGrow(0);
@@ -114,7 +114,7 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     private void prepareForeignPhraseColumn() {
-        foreignPhraseColumn = grid
+        foreignPhraseColumn = phraseGrid
                 .addColumn(Phrase::getForeignPhrase)
                 .setWidth("300px");
 
@@ -128,7 +128,7 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     private void prepareExamColumn() {
-         examColumn = grid
+         examColumn = phraseGrid
                 .addColumn(Phrase::getPhraseExam)
                 .setWidth("300px");
 
@@ -141,7 +141,7 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     private void prepareActionsColumn() {
-         actionsColumn = grid
+         actionsColumn = phraseGrid
                 .addColumn(unused -> "")
                 .setWidth("200px")
                 .setFlexGrow(0);
@@ -168,7 +168,7 @@ public class PhraseGrid extends VerticalLayout {
     }
 
     private void listenRemoveButton(ClickEvent<Button> event) {
-        Phrase selectedPhrase = grid.asSingleSelect().getValue();
+        Phrase selectedPhrase = phraseGrid.asSingleSelect().getValue();
         removePhrase(selectedPhrase);
     }
 
@@ -181,7 +181,7 @@ public class PhraseGrid extends VerticalLayout {
 
         examField.setValue("");
 
-        grid.getListDataView().refreshAll();
+        phraseGrid.getListDataView().refreshAll();
     }
 
     private void listenEditorCancel(EditorCancelEvent<Phrase> event){
