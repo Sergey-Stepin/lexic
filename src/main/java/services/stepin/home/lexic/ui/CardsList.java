@@ -99,11 +99,11 @@ public class CardsList extends VerticalLayout {
     private CardForm createCardForm() {
 
         CardForm cardForm = new CardForm(LANGUAGE_CODES, REPETITION_FREQUENCIES);
-        //cardForm.setWidth("25em");
 
         cardForm.addSaveListener(this::saveCard);
         cardForm.addDeleteListener(this::deleteCard);
         cardForm.addCloseListener(event -> closeEditor());
+
 
         return cardForm;
     }

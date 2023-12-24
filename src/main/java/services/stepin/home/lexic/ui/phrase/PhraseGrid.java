@@ -79,6 +79,7 @@ public class PhraseGrid extends VerticalLayout {
 
         phraseGrid.setSelectionMode(SINGLE);
         phraseGrid.asSingleSelect().setRequiredIndicatorVisible(true);
+        phraseGrid.setAllRowsVisible(true);
 
         prepareColumns();
         prepareEditor();

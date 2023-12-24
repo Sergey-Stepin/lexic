@@ -8,6 +8,7 @@ import java.util.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
+import static services.stepin.home.lexic.model.RepetitionFrequency.WEEKLY;
 
 @Entity
 @Data
@@ -24,12 +25,10 @@ public class Card {
     private LanguageCode languageCode = DE;
 
     @Enumerated(EnumType.STRING)
-    private RepetitionFrequency repetitionFrequency;
-
-    //@ElementCollection(fetch = FetchType.EAGER)
-    //private Set<String> localWords;
+    private RepetitionFrequency repetitionFrequency = WEEKLY;
 
     private String localWord;
+    private String foreignWord;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> foreignWords;

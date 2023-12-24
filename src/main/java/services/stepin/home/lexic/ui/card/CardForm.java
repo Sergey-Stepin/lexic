@@ -39,6 +39,7 @@ public class CardForm extends FormLayout {
     private final ComboBox<LanguageCode> languageCode = new ComboBox<>("Language");
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
     private final TextField localWord = new TextField("Local");
+    private final TextField foreignWord = new TextField("Foreign");
     private final PhrasesComponent phrasesComponent = new PhrasesComponent();
 
     private Card card;
@@ -52,11 +53,19 @@ public class CardForm extends FormLayout {
 
         cardBinder.bindInstanceFields(this);
 
-        Component content = createContent();
-        Component toolBar = createToolbar();
+        VerticalLayout layout = new VerticalLayout();
+        layout.add(createContent());
+        layout.add(createToolbar());
+        //layout.setPadding(false);
 
-        VerticalLayout layout = new VerticalLayout(content, toolBar);
+        layout.getStyle().set("border-width", "thin");
+        layout.getStyle().set("border-style", "solid");
+        layout.getStyle().set("border-color", "var(--lumo-contrast-20pct)");
+        layout.getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+
         add(layout);
+        setResponsiveSteps(new ResponsiveStep("0", 1));
+
     }
 
     private Component createContent() {
@@ -68,10 +77,17 @@ public class CardForm extends FormLayout {
         repetitionFrequency.setValue(DAYLY);
 
         VerticalLayout contentLayout = new VerticalLayout();
-        contentLayout.add(localWord);
+
+        HorizontalLayout propertiesLayout = new HorizontalLayout(languageCode, repetitionFrequency);
+        contentLayout.add(propertiesLayout);
+
+        HorizontalLayout wordLayout = new HorizontalLayout(localWord, foreignWord);
+        contentLayout.add(wordLayout);
+
         contentLayout.add(phrasesComponent);
-        contentLayout.add(languageCode);
-        contentLayout.add(repetitionFrequency);
+
+        contentLayout.setPadding(false);
+        contentLayout.setSpacing(false);
 
         return contentLayout;
     }

@@ -17,6 +17,7 @@ public class PhrasesComponent extends VerticalLayout {
 
         add(createToolbar());
         add(phraseGrid);
+
     }
 
     private Component createToolbar() {
