@@ -37,4 +37,22 @@ public class Card {
 
     private List<Phrase> phraseList = new ArrayList<>();
 
+    @Transient
+    private String localFirstExample;
+
+    @Transient
+    private String localSecondExample;
+
+    @Transient
+    private String localThirdExample;
+
+    @Transient
+    private String foreignFirstExample;
+
+    @Transient
+    private String foreignSecondExample;
+
+    @Transient
+    private String foreignThirdExample;
+
 }

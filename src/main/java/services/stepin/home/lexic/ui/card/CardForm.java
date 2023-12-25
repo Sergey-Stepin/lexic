@@ -14,14 +14,12 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import org.hibernate.sql.ast.tree.expression.Collation;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.model.RepetitionFrequency;
-import services.stepin.home.lexic.ui.phrase.PhrasesComponent;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import static services.stepin.home.lexic.model.LanguageCode.DE;
@@ -40,7 +38,12 @@ public class CardForm extends FormLayout {
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
     private final TextField localWord = new TextField("Local");
     private final TextField foreignWord = new TextField("Foreign");
-    private final PhrasesComponent phrasesComponent = new PhrasesComponent();
+    private final TextField localFirstExample = new TextField();
+    private final TextField localSecondExample = new TextField();
+    private final TextField localThirdExample = new TextField();
+    private final TextField foreignFirstExample = new TextField();
+    private final TextField foreignSecondExample = new TextField();
+    private final TextField foreignThirdExample = new TextField();
 
     private Card card;
 
@@ -56,7 +59,6 @@ public class CardForm extends FormLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.add(createContent());
         layout.add(createToolbar());
-        //layout.setPadding(false);
 
         layout.getStyle().set("border-width", "thin");
         layout.getStyle().set("border-style", "solid");
@@ -84,12 +86,20 @@ public class CardForm extends FormLayout {
         HorizontalLayout wordLayout = new HorizontalLayout(localWord, foreignWord);
         contentLayout.add(wordLayout);
 
-        contentLayout.add(phrasesComponent);
+        contentLayout.add(prepareExamplesPanel());
 
         contentLayout.setPadding(false);
         contentLayout.setSpacing(false);
 
         return contentLayout;
+    }
+
+    private Component prepareExamplesPanel() {
+        HorizontalLayout exampleFirst = new HorizontalLayout(localFirstExample, foreignFirstExample);
+        HorizontalLayout exampleSecond = new HorizontalLayout(localSecondExample, foreignSecondExample);
+        HorizontalLayout exampleThird = new HorizontalLayout(localThirdExample, foreignThirdExample);
+
+        return new VerticalLayout(exampleFirst, exampleSecond, exampleThird);
     }
 
     private Component createToolbar() {
@@ -113,24 +123,90 @@ public class CardForm extends FormLayout {
     public void setCard(Card card) {
 
         this.card = card;
-        cardBinder.readBean(card);
 
         if(card != null)
-            this.phrasesComponent.getPhraseGrid().setPhrases(card.getPhraseList());
+            setExamples(card);
+
+        cardBinder.readBean(card);
+    }
+
+    private void setExamples(Card card) {
+
+        List<Phrase> phrases = card.getPhraseList();
+        setFirstExample(phrases);
+        setSecondExample(phrases);
+        setThirdExample(phrases);
+    }
+
+    private void setFirstExample(List<Phrase> phrases){
+
+        if(phrases.size() < 1)
+            return;
+
+        Phrase phrase = phrases.get(0);
+        if(phrase == null)
+            return;
+
+        localFirstExample.setValue(phrase.getLocalPhrase());
+        foreignFirstExample.setValue(phrase.getForeignPhrase());
+    }
+
+    private void setSecondExample(List<Phrase> phrases){
+
+        if(phrases.size() < 2)
+            return;
+
+        Phrase phrase = phrases.get(1);
+        if(phrase == null)
+            return;
+
+        localSecondExample.setValue(phrase.getLocalPhrase());
+        foreignSecondExample.setValue(phrase.getForeignPhrase());
+    }
+
+    private void setThirdExample(List<Phrase> phrases){
+
+        if(phrases.size() < 3)
+            return;
+
+        Phrase phrase = phrases.get(2);
+        if(phrase == null)
+            return;
+
+        localThirdExample.setValue(phrase.getLocalPhrase());
+        foreignThirdExample.setValue(phrase.getForeignPhrase());
     }
 
     private void validateAndSave() {
         try {
 
-
-            Collection<Phrase> prases = this.phrasesComponent.getPhraseGrid().getPhrases();
-            this.card.setPhraseList(prases.stream().toList());
+            setPhrases(card);
 
             cardBinder.writeBean(card);
             fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
         } catch (ValidationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setPhrases(Card card){
+
+        List<Phrase> phrases = new ArrayList<>();
+
+        Phrase firstPhrase = createPhrase(localFirstExample.getValue(), foreignFirstExample.getValue());
+        phrases.add(firstPhrase);
+
+        Phrase secondPhrase = createPhrase(localSecondExample.getValue(), foreignSecondExample.getValue());
+        phrases.add(secondPhrase);
+
+        Phrase thirdPhrase = createPhrase(localThirdExample.getValue(), foreignThirdExample.getValue());
+        phrases.add(thirdPhrase);
+
+        card.setPhraseList(phrases);
+    }
+
+    private Phrase createPhrase(String local, String foreign){
+        return new Phrase(languageCode.getValue(), local, foreign);
     }
 
     public Registration addDeleteListener(ComponentEventListener<CardFormDeleteEvent> listener) {
