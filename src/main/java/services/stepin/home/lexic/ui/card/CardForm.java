@@ -56,42 +56,23 @@ public class CardForm extends FormLayout {
 
         cardBinder.bindInstanceFields(this);
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.add(createContent());
-        layout.add(createToolbar());
-
-        layout.getStyle().set("border-width", "thin");
-        layout.getStyle().set("border-style", "solid");
-        layout.getStyle().set("border-color", "var(--lumo-contrast-20pct)");
-        layout.getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-
-        add(layout);
-        setResponsiveSteps(new ResponsiveStep("0", 1));
-
-    }
-
-    private Component createContent() {
-
         languageCode.setItems(languageCodes);
         repetitionFrequency.setItems(repetitionFrequencies);
 
         languageCode.setValue(DE);
         repetitionFrequency.setValue(DAYLY);
 
-        VerticalLayout contentLayout = new VerticalLayout();
+        addLayout();
+    }
+
+    private void addLayout() {
 
         HorizontalLayout propertiesLayout = new HorizontalLayout(languageCode, repetitionFrequency);
-        contentLayout.add(propertiesLayout);
+        //add(propertiesLayout);
 
-        HorizontalLayout wordLayout = new HorizontalLayout(localWord, foreignWord);
-        contentLayout.add(wordLayout);
+        add(localWord, foreignWord);
 
-        contentLayout.add(prepareExamplesPanel());
-
-        contentLayout.setPadding(false);
-        contentLayout.setSpacing(false);
-
-        return contentLayout;
+        //setResponsiveSteps(new ResponsiveStep("0", 1));
     }
 
     private Component prepareExamplesPanel() {
