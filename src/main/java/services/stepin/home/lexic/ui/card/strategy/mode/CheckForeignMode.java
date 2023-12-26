@@ -26,6 +26,7 @@ public class CheckForeignMode implements Mode {
         cardForm.getForeignSecondExample().setVisible(false);
         cardForm.getForeignThirdExample().setVisible(false);
 
+        cardForm.getCheckWord().setTooltipText(cardForm.getForeignWord().getValue());
         cardForm.getCheckFirstExample().setTooltipText(cardForm.getForeignFirstExample().getValue());
         cardForm.getCheckSecondExample().setTooltipText(cardForm.getForeignSecondExample().getValue());
         cardForm.getCheckThirdExample().setTooltipText(cardForm.getForeignThirdExample().getValue());

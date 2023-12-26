@@ -1,8 +1,12 @@
 - add strategy (interface) edit/local/foreign
 - add strategy (interface) part of speech
-- for noun: (gender) colours, plural from
-- export/import json
-- for verb: forms
+- for noun:
+    radioGroup for gender
+    change colours for gender
+    plural from
 - real db
+- export/import json
+- for verb:
+    forms of verb
 - add property: noun/adjective/verb ...
 - add localization (EN, RU, DE)

@@ -119,6 +119,13 @@ public class CardForm extends FormLayout {
         add(foreignWord);
         add(checkWord);
 
+        addExamples();;
+
+        setResponsiveSteps(new ResponsiveStep("0", 2));
+    }
+
+    private void addExamples(){
+
         add(new Span(LOCAL_EXAMPLE_LABEL));
         add(new Span(FOREIGN_EXAMPLE_LABEL));
 
@@ -134,6 +141,37 @@ public class CardForm extends FormLayout {
         add(foreignThirdExample);
         add(checkThirdExample);
 
+        setAutocomplete();
+        setExampleToolTips();
+    }
+
+    private void setAutocomplete() {
+        checkWord.getElement().setAttribute("autocomplete", "off");
+        checkFirstExample.getElement().setAttribute("autocomplete", "off");
+        checkSecondExample.getElement().setAttribute("autocomplete", "off");
+        checkThirdExample.getElement().setAttribute("autocomplete", "off");
+    }
+
+    private void setExampleToolTips(){
+        setCheckWordTooltip();
+        setFirstExampleTooltip();
+        setSecondExampleTooltip();
+        setThirdExampleTooltip();
+    }
+
+    private void setCheckWordTooltip() {
+        checkWord.getTooltip().setManual(true);
+        checkWord.addKeyDownListener(
+                Key.SPACE,
+                event -> checkWord.getTooltip().setOpened(true),
+                CONTROL);
+        checkWord.addKeyUpListener(
+                Key.SPACE,
+                event -> checkWord.getTooltip().setOpened(false),
+                CONTROL);
+    }
+
+    private void setFirstExampleTooltip(){
         checkFirstExample.getTooltip().setManual(true);
         checkFirstExample.addKeyDownListener(
                 Key.SPACE,
@@ -143,9 +181,30 @@ public class CardForm extends FormLayout {
                 Key.SPACE,
                 event -> checkFirstExample.getTooltip().setOpened(false),
                 CONTROL);
+    }
 
+    private void setSecondExampleTooltip(){
+        checkSecondExample.getTooltip().setManual(true);
+        checkSecondExample.addKeyDownListener(
+                Key.SPACE,
+                event -> checkSecondExample.getTooltip().setOpened(true),
+                CONTROL);
+        checkSecondExample.addKeyUpListener(
+                Key.SPACE,
+                event -> checkSecondExample.getTooltip().setOpened(false),
+                CONTROL);
+    }
 
-        setResponsiveSteps(new ResponsiveStep("0", 2));
+    private void setThirdExampleTooltip(){
+        checkThirdExample.getTooltip().setManual(true);
+        checkThirdExample.addKeyDownListener(
+                Key.SPACE,
+                event -> checkThirdExample.getTooltip().setOpened(true),
+                CONTROL);
+        checkThirdExample.addKeyUpListener(
+                Key.SPACE,
+                event -> checkThirdExample.getTooltip().setOpened(false),
+                CONTROL);
     }
 
     private Component createToolbar() {
@@ -215,12 +274,20 @@ public class CardForm extends FormLayout {
         if(card != null)
             setExamples(card);
 
-        atoSetMode(card);
+        clearExamples();
+        autoSetMode(card);
 
         cardBinder.readBean(card);
     }
 
-    private void atoSetMode(Card card) {
+    private void clearExamples() {
+        checkWord.setValue("");
+        checkFirstExample.setValue("");
+        checkSecondExample.setValue("");
+        checkThirdExample.setValue("");
+    }
+
+    private void autoSetMode(Card card) {
         if(card == null)
             modesGroup.setValue(EDIT);
     }
