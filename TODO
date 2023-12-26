@@ -1,6 +1,8 @@
 - add strategy (interface) edit/local/foreign
 - add strategy (interface) part of speech
-- for noun: colours, plural
+- for noun: (gender) colours, plural from
+- export/import json
 - for verb: forms
+- real db
 - add property: noun/adjective/verb ...
 - add localization (EN, RU, DE)

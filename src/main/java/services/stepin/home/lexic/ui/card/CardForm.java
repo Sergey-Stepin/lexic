@@ -1,9 +1,6 @@
 package services.stepin.home.lexic.ui.card;
 
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -31,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.vaadin.flow.component.KeyModifier.CONTROL;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.RepetitionFrequency.DAYLY;
 import static services.stepin.home.lexic.ui.CardsList.FOREIGN_LANGUAGE;
@@ -67,17 +65,24 @@ public class CardForm extends FormLayout {
     @Getter
     private final TextField foreignWord = new TextField("Foreign");
     @Getter
+    private final TextField checkWord = new TextField("Check");
+    @Getter
     private final TextField localFirstExample = new TextField();
-    @Getter
-    private final TextField localSecondExample = new TextField();
-    @Getter
-    private final TextField localThirdExample = new TextField();
     @Getter
     private final TextField foreignFirstExample = new TextField();
     @Getter
+    private final TextField checkFirstExample = new TextField();
+    @Getter
+    private final TextField localSecondExample = new TextField();
+    @Getter
     private final TextField foreignSecondExample = new TextField();
     @Getter
+    private final TextField checkSecondExample = new TextField();
+    private final TextField localThirdExample = new TextField();
+    @Getter
     private final TextField foreignThirdExample = new TextField();
+    @Getter
+    private final TextField checkThirdExample = new TextField();
 
     private Card card;
 
@@ -112,18 +117,33 @@ public class CardForm extends FormLayout {
 
         add(localWord);
         add(foreignWord);
+        add(checkWord);
 
         add(new Span(LOCAL_EXAMPLE_LABEL));
         add(new Span(FOREIGN_EXAMPLE_LABEL));
 
         add(localFirstExample);
         add(foreignFirstExample);
+        add(checkFirstExample);
 
         add(localSecondExample);
         add(foreignSecondExample);
+        add(checkSecondExample);
 
         add(localThirdExample);
         add(foreignThirdExample);
+        add(checkThirdExample);
+
+        checkFirstExample.getTooltip().setManual(true);
+        checkFirstExample.addKeyDownListener(
+                Key.SPACE,
+                event -> checkFirstExample.getTooltip().setOpened(true),
+                CONTROL);
+        checkFirstExample.addKeyUpListener(
+                Key.SPACE,
+                event -> checkFirstExample.getTooltip().setOpened(false),
+                CONTROL);
+
 
         setResponsiveSteps(new ResponsiveStep("0", 2));
     }

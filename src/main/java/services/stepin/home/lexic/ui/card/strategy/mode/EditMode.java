@@ -14,6 +14,18 @@ public class EditMode implements Mode {
     public void on() {
         cardForm.getSaveButton().setEnabled(true);
         cardForm.getDeleteButton().setEnabled(true);
+
+        cardForm.getForeignWord().setVisible(true);
+        cardForm.getCheckWord().setVisible(false);
+
+        cardForm.getCheckFirstExample().setVisible(false);
+        cardForm.getCheckSecondExample().setVisible(false);
+        cardForm.getCheckThirdExample().setVisible(false);
+
+        cardForm.getForeignFirstExample().setVisible(true);
+        cardForm.getForeignSecondExample().setVisible(true);
+        cardForm.getForeignThirdExample().setVisible(true);
+
     }
 
     @Override
