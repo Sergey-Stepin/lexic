@@ -113,8 +113,6 @@ public class CardForm extends FormLayout {
 
         addLayout();
 
-        modes.setValue(EDIT);
-
         cardBinder.bindInstanceFields(this);
 
     }
@@ -381,7 +379,6 @@ public class CardForm extends FormLayout {
             setManuallyBoundField();
 
         clearExamples();
-        autoSetMode(card);
 
         cardBinder.readBean(card);
     }
@@ -390,6 +387,7 @@ public class CardForm extends FormLayout {
         setExamples();
         setPartOfSpeech();
         setGender();
+        autoSetMode();
     }
 
     private void clearExamples() {
@@ -399,8 +397,8 @@ public class CardForm extends FormLayout {
         checkThirdExample.setValue("");
     }
 
-    private void autoSetMode(Card card) {
-        if (card == null)
+    private void autoSetMode() {
+        if (modes.getValue() == null)
             modes.setValue(EDIT);
     }
 
