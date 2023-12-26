@@ -13,6 +13,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import elemental.json.impl.JsonUtil;
+import jdk.swing.interop.SwingInterOpUtils;
 import lombok.Getter;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
@@ -22,19 +24,22 @@ import services.stepin.home.lexic.ui.card.strategy.mode.CheckForeignMode;
 import services.stepin.home.lexic.ui.card.strategy.mode.EditMode;
 import services.stepin.home.lexic.ui.card.strategy.mode.Mode;
 import services.stepin.home.lexic.ui.card.strategy.mode.ModeType;
+import services.stepin.home.lexic.ui.card.strategy.speech.Noun;
+import services.stepin.home.lexic.ui.card.strategy.speech.OtherPartOfSpeech;
+import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeech;
+import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.vaadin.flow.component.KeyModifier.CONTROL;
+import static services.stepin.home.lexic.model.Card.Gender.*;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.RepetitionFrequency.DAYLY;
 import static services.stepin.home.lexic.ui.CardsList.FOREIGN_LANGUAGE;
 import static services.stepin.home.lexic.ui.CardsList.LOCAL_LANGUAGE;
 import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
 import static services.stepin.home.lexic.ui.card.strategy.mode.ModeType.*;
+import static services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType.*;
 
 public class CardForm extends FormLayout {
 
@@ -42,7 +47,8 @@ public class CardForm extends FormLayout {
     private static final String FOREIGN_EXAMPLE_LABEL = "Example (" + FOREIGN_LANGUAGE + "):";
     private final Binder<Card> cardBinder = new BeanValidationBinder<>(Card.class);
 
-    private final Map<ModeType, Mode> modes = new HashMap<>();
+    private final EnumMap<ModeType, Mode> modeMap = new EnumMap<>(ModeType.class);
+    private final EnumMap<PartOfSpeechType, PartOfSpeech> partsOfSpeechMap = new EnumMap<>(PartOfSpeechType.class);
 
     @Getter
     private final List<LanguageCode> languageCodes;
@@ -55,7 +61,11 @@ public class CardForm extends FormLayout {
     @Getter
     private final Button cancelButton = new Button("Cancel");
     @Getter
-    private final RadioButtonGroup<ModeType> modesGroup = new RadioButtonGroup<>();
+    private final RadioButtonGroup<ModeType> modes = new RadioButtonGroup<>();
+    @Getter
+    private final RadioButtonGroup<PartOfSpeechType> partOfSpeech = new RadioButtonGroup<>();
+    @Getter
+    private final RadioButtonGroup<Card.Gender> gender = new RadioButtonGroup<>();
     @Getter
     private final ComboBox<LanguageCode> languageCode = new ComboBox<>("Language");
     @Getter
@@ -95,8 +105,6 @@ public class CardForm extends FormLayout {
 
         addClassName("card-form-class");
 
-        cardBinder.bindInstanceFields(this);
-
         languageCode.setItems(languageCodes);
         repetitionFrequency.setItems(repetitionFrequencies);
 
@@ -105,7 +113,10 @@ public class CardForm extends FormLayout {
 
         addLayout();
 
-        modesGroup.setValue(EDIT);
+        modes.setValue(EDIT);
+
+        cardBinder.bindInstanceFields(this);
+
     }
 
     private void addLayout() {
@@ -115,16 +126,39 @@ public class CardForm extends FormLayout {
         HorizontalLayout propertiesLayout = new HorizontalLayout(languageCode, repetitionFrequency);
         add(propertiesLayout);
 
+        add(preparePartOfSpeechGroup());
+        add(prepareGenderGroup());
+
         add(localWord);
         add(foreignWord);
         add(checkWord);
 
-        addExamples();;
+        addExamples();
 
         setResponsiveSteps(new ResponsiveStep("0", 2));
     }
 
-    private void addExamples(){
+    private Component preparePartOfSpeechGroup() {
+        partOfSpeech.setItems(
+                NOUN,
+                VERB,
+                OTHER);
+
+        partOfSpeech.setItemLabelGenerator(this::generatePartOfSpeechLabel);
+        partOfSpeech.addValueChangeListener(this::onPartOfSpeechChangedChanged);
+
+        return partOfSpeech;
+
+    }
+
+    private Component prepareGenderGroup() {
+        gender.setItems(Card.Gender.values());
+        gender.setItemLabelGenerator(this::generateGenderLabel);
+        gender.addValueChangeListener(this::onGenderChanged);
+        return gender;
+    }
+
+    private void addExamples() {
 
         add(new Span(LOCAL_EXAMPLE_LABEL));
         add(new Span(FOREIGN_EXAMPLE_LABEL));
@@ -145,6 +179,74 @@ public class CardForm extends FormLayout {
         setExampleToolTips();
     }
 
+    private String generatePartOfSpeechLabel(PartOfSpeechType partOfSpeechType) {
+        return partOfSpeechType.name().toLowerCase();
+    }
+
+    private void onPartOfSpeechChangedChanged(
+            AbstractField.ComponentValueChangeEvent<RadioButtonGroup<PartOfSpeechType>, PartOfSpeechType> event) {
+
+        PartOfSpeechType partOfSpeechType = event.getValue();
+
+        if(card == null)
+            return;
+
+        setPartOfSpeechMap(partOfSpeechType);
+    }
+
+    private void setPartOfSpeechMap(PartOfSpeechType partOfSpeechType) {
+        PartOfSpeech part = loadPartOfSpeech(partOfSpeechType);
+        part.on();
+    }
+
+    private PartOfSpeech loadPartOfSpeech(PartOfSpeechType partOfSpeechType) {
+
+        if (NOUN.equals(partOfSpeechType))
+            return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new Noun(this));
+
+        else if (VERB.equals(partOfSpeechType))
+            throw new UnsupportedOperationException("Verb as part of speech is not implemented yet");
+
+        else if (OTHER.equals(partOfSpeechType))
+            return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new OtherPartOfSpeech(this));
+
+        else
+            throw new IllegalArgumentException(" Unexpected part of speech: " + partOfSpeechType);
+    }
+
+    private String generateGenderLabel(Card.Gender genderItem) {
+        return genderItem.name().toLowerCase();
+    }
+
+    private void onGenderChanged(
+            AbstractField.ComponentValueChangeEvent<RadioButtonGroup<Card.Gender>, Card.Gender> event) {
+
+        Card.Gender selectedGender = event.getValue();
+
+        if(card != null)
+            this.card.setGender(selectedGender);
+
+        if (MASCULINE.equals(selectedGender))
+            setForMasculin();
+        else if (FEMININE.equals(selectedGender))
+            setForFeminine();
+        else if (NEUTER.equals(selectedGender))
+            setForNeuter();
+    }
+
+    private void setForMasculin() {
+        foreignFirstExample.getStyle().setBackground("green");
+    }
+
+    private void setForFeminine() {
+        foreignFirstExample.getStyle().setBackground("red");
+    }
+
+    private void setForNeuter() {
+        foreignFirstExample.getStyle().setBackground("blue");
+    }
+
+
     private void setAutocomplete() {
         checkWord.getElement().setAttribute("autocomplete", "off");
         checkFirstExample.getElement().setAttribute("autocomplete", "off");
@@ -152,7 +254,7 @@ public class CardForm extends FormLayout {
         checkThirdExample.getElement().setAttribute("autocomplete", "off");
     }
 
-    private void setExampleToolTips(){
+    private void setExampleToolTips() {
         setCheckWordTooltip();
         setFirstExampleTooltip();
         setSecondExampleTooltip();
@@ -171,7 +273,7 @@ public class CardForm extends FormLayout {
                 CONTROL);
     }
 
-    private void setFirstExampleTooltip(){
+    private void setFirstExampleTooltip() {
         checkFirstExample.getTooltip().setManual(true);
         checkFirstExample.addKeyDownListener(
                 Key.SPACE,
@@ -183,7 +285,7 @@ public class CardForm extends FormLayout {
                 CONTROL);
     }
 
-    private void setSecondExampleTooltip(){
+    private void setSecondExampleTooltip() {
         checkSecondExample.getTooltip().setManual(true);
         checkSecondExample.addKeyDownListener(
                 Key.SPACE,
@@ -195,7 +297,7 @@ public class CardForm extends FormLayout {
                 CONTROL);
     }
 
-    private void setThirdExampleTooltip(){
+    private void setThirdExampleTooltip() {
         checkThirdExample.getTooltip().setManual(true);
         checkThirdExample.addKeyDownListener(
                 Key.SPACE,
@@ -227,57 +329,67 @@ public class CardForm extends FormLayout {
         return buttonLayout;
     }
 
-    private Component createModesGroup(){
-        modesGroup.setItems(
+    private Component createModesGroup() {
+        modes.setItems(
                 EDIT,
                 CHECK_FOREIGN,
                 CHECK_LOCAL);
 
-        modesGroup.setItemLabelGenerator(ModeType::getTitle);
+        modes.setItemLabelGenerator(ModeType::getTitle);
 
-        add(modesGroup);
+        add(modes);
 
-        modesGroup.addValueChangeListener(this::onModeChanged);
+        modes.addValueChangeListener(this::onModeChanged);
 
-        return modesGroup;
+        return modes;
     }
 
     private void onModeChanged(AbstractField.ComponentValueChangeEvent<RadioButtonGroup<ModeType>, ModeType> event) {
         ModeType modeType = event.getValue();
+
+        if(card == null)
+            return;
+
         setMode(modeType);
     }
 
-    private void setMode(ModeType modeType){
+    private void setMode(ModeType modeType) {
         Mode mode = loadMode(modeType);
         mode.on();
     }
 
     private Mode loadMode(ModeType modeType) {
 
-        if(EDIT.equals(modeType))
-            return modes.computeIfAbsent(modeType, key -> new EditMode(this));
+        if (EDIT.equals(modeType))
+            return modeMap.computeIfAbsent(modeType, key -> new EditMode(this));
 
         else if (CHECK_FOREIGN.equals(modeType))
-            return modes.computeIfAbsent(modeType, key -> new CheckForeignMode(this));
+            return modeMap.computeIfAbsent(modeType, key -> new CheckForeignMode(this));
 
         else if (CHECK_LOCAL.equals(modeType))
             throw new UnsupportedOperationException("CHECK_LOCAL mode is not implemented yet");
 
         else
-            throw  new IllegalArgumentException(" Unexpected mode type: " + modeType);
+            throw new IllegalArgumentException(" Unexpected mode type: " + modeType);
     }
 
     public void setCard(Card card) {
 
         this.card = card;
 
-        if(card != null)
-            setExamples(card);
+        if (card != null)
+            setManuallyBoundField();
 
         clearExamples();
         autoSetMode(card);
 
         cardBinder.readBean(card);
+    }
+
+    private void setManuallyBoundField(){
+        setExamples();
+        setPartOfSpeech();
+        setGender();
     }
 
     private void clearExamples() {
@@ -288,11 +400,11 @@ public class CardForm extends FormLayout {
     }
 
     private void autoSetMode(Card card) {
-        if(card == null)
-            modesGroup.setValue(EDIT);
+        if (card == null)
+            modes.setValue(EDIT);
     }
 
-    private void setExamples(Card card) {
+    private void setExamples() {
 
         List<Phrase> phrases = card.getPhraseList();
 
@@ -301,39 +413,49 @@ public class CardForm extends FormLayout {
         setThirdExample(phrases);
     }
 
-    private void setFirstExample(List<Phrase> phrases){
+    private void setPartOfSpeech(){
+        PartOfSpeechType storedValue = card.getPartOfSpeech();
+        partOfSpeech.setValue(storedValue);
+    }
 
-        if(phrases.size() < 1)
+    private void setGender(){
+        Card.Gender storedValue = card.getGender();
+        gender.setValue(storedValue);
+    }
+
+    private void setFirstExample(List<Phrase> phrases) {
+
+        if (phrases.size() < 1)
             return;
 
         Phrase phrase = phrases.get(0);
-        if(phrase == null)
+        if (phrase == null)
             return;
 
         card.setLocalFirstExample(phrase.getLocalPhrase());
         card.setForeignFirstExample(phrase.getForeignPhrase());
     }
 
-    private void setSecondExample(List<Phrase> phrases){
+    private void setSecondExample(List<Phrase> phrases) {
 
-        if(phrases.size() < 2)
+        if (phrases.size() < 2)
             return;
 
         Phrase phrase = phrases.get(1);
-        if(phrase == null)
+        if (phrase == null)
             return;
 
         card.setLocalSecondExample(phrase.getLocalPhrase());
         card.setForeignSecondExample(phrase.getForeignPhrase());
     }
 
-    private void setThirdExample(List<Phrase> phrases){
+    private void setThirdExample(List<Phrase> phrases) {
 
-        if(phrases.size() < 3)
+        if (phrases.size() < 3)
             return;
 
         Phrase phrase = phrases.get(2);
-        if(phrase == null)
+        if (phrase == null)
             return;
 
         card.setLocalThirdExample(phrase.getLocalPhrase());
@@ -341,18 +463,18 @@ public class CardForm extends FormLayout {
     }
 
     private void validateAndSave() {
+
         try {
-
             setPhrases(card);
-
             cardBinder.writeBean(card);
             fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
+
         } catch (ValidationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setPhrases(Card card){
+    private void setPhrases(Card card) {
 
         List<Phrase> phrases = new ArrayList<>();
 
@@ -368,7 +490,7 @@ public class CardForm extends FormLayout {
         card.setPhraseList(phrases);
     }
 
-    private Phrase createPhrase(String local, String foreign){
+    private Phrase createPhrase(String local, String foreign) {
         return new Phrase(languageCode.getValue(), local, foreign);
     }
 

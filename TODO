@@ -6,7 +6,9 @@
     plural from
 - real db
 - export/import json
+- filtering: Daily/Weekly/Monthly ...
+
 - for verb:
     forms of verb
-- add property: noun/adjective/verb ...
+
 - add localization (EN, RU, DE)

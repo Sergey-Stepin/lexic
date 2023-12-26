@@ -2,7 +2,7 @@ package services.stepin.home.lexic.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.apache.commons.compress.utils.Sets;
+import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
 
 import java.util.*;
 
@@ -13,6 +13,8 @@ import static services.stepin.home.lexic.model.RepetitionFrequency.WEEKLY;
 @Entity
 @Data
 public class Card {
+
+    public enum Gender{MASCULINE, FEMININE, NEUTER}
 
     public static final List<LanguageCode> LANGUAGE_CODES = Arrays.stream(LanguageCode.values()).toList();
     public static final List<RepetitionFrequency> REPETITION_FREQUENCIES = Arrays.stream(RepetitionFrequency.values()).toList();
@@ -26,6 +28,12 @@ public class Card {
 
     @Enumerated(EnumType.STRING)
     private RepetitionFrequency repetitionFrequency = WEEKLY;
+
+    @Enumerated(EnumType.STRING)
+    private PartOfSpeechType partOfSpeech;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     private String localWord;
     private String foreignWord;
