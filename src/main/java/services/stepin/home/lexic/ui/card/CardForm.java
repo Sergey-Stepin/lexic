@@ -126,6 +126,7 @@ public class CardForm extends FormLayout {
     private void setExamples(Card card) {
 
         List<Phrase> phrases = card.getPhraseList();
+
         setFirstExample(phrases);
         setSecondExample(phrases);
         setThirdExample(phrases);
@@ -140,8 +141,8 @@ public class CardForm extends FormLayout {
         if(phrase == null)
             return;
 
-        localFirstExample.setValue(phrase.getLocalPhrase());
-        foreignFirstExample.setValue(phrase.getForeignPhrase());
+        card.setLocalFirstExample(phrase.getLocalPhrase());
+        card.setForeignFirstExample(phrase.getForeignPhrase());
     }
 
     private void setSecondExample(List<Phrase> phrases){
@@ -153,8 +154,8 @@ public class CardForm extends FormLayout {
         if(phrase == null)
             return;
 
-        localSecondExample.setValue(phrase.getLocalPhrase());
-        foreignSecondExample.setValue(phrase.getForeignPhrase());
+        card.setLocalSecondExample(phrase.getLocalPhrase());
+        card.setForeignSecondExample(phrase.getForeignPhrase());
     }
 
     private void setThirdExample(List<Phrase> phrases){
@@ -166,8 +167,8 @@ public class CardForm extends FormLayout {
         if(phrase == null)
             return;
 
-        localThirdExample.setValue(phrase.getLocalPhrase());
-        foreignThirdExample.setValue(phrase.getForeignPhrase());
+        card.setLocalThirdExample(phrase.getLocalPhrase());
+        card.setForeignThirdExample(phrase.getForeignPhrase());
     }
 
     private void validateAndSave() {
