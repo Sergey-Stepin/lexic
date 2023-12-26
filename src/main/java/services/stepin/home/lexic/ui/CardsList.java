@@ -1,5 +1,6 @@
 package services.stepin.home.lexic.ui;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -16,22 +17,29 @@ import services.stepin.home.lexic.service.CardService;
 import services.stepin.home.lexic.ui.card.CardFormEvent;
 import services.stepin.home.lexic.ui.card.CardForm;
 
+import java.util.List;
+
 import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
-import static services.stepin.home.lexic.model.Card.LANGUAGE_CODES;
-import static services.stepin.home.lexic.model.Card.REPETITION_FREQUENCIES;
+import static com.vaadin.flow.data.value.ValueChangeMode.TIMEOUT;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.LanguageCode.RU;
+import static services.stepin.home.lexic.model.RepetitionFrequency.ALL;
+import static services.stepin.home.lexic.model.RepetitionFrequency.DAILY;
 
 @Route(value = "lexic")
 @PageTitle("Lexic | cards")
 public class CardsList extends VerticalLayout {
 
-    private final CardService cardService;
-
     public static final LanguageCode FOREIGN_LANGUAGE = DE;
     public static final LanguageCode LOCAL_LANGUAGE = RU;
+    private static final int DEFAULT_PAGE_SIZE = 100;
+
+
+    private final CardService cardService;
+
     private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
     private final TextField localWordFilter = new TextField();;
+    private final Button addCardButton = new Button("Add card");
 
     private Grid<Card> cardsGrid;
     private CardForm cardForm;
@@ -43,30 +51,58 @@ public class CardsList extends VerticalLayout {
         addClassName("cards-class");
         setSizeFull();
 
-        add(createToolbar());
-        add(createContent());
+        add(prepareToolbar());
+        add(prepareContent());
 
         updateList();
         closeEditor();
     }
 
-    private Component createToolbar() {
+    private Component prepareToolbar() {
 
-        localWordFilter.setPlaceholder("find by word ...");
-        localWordFilter.setClearButtonVisible(true);
-        localWordFilter.setValueChangeMode(LAZY);
-        localWordFilter.addValueChangeListener(event -> updateList());
 
-        Button addCardButton = new Button("Add card");
-        addCardButton.addClickListener(event -> addCard());
-
-        HorizontalLayout toolBar = new HorizontalLayout(localWordFilter, addCardButton);
+        HorizontalLayout toolBar = new HorizontalLayout();
         toolBar.addClassName("toolbar-class");
+
+        toolBar.add(prepareWordFilter());
+        toolBar.add(prepareFrequencyFilter());
+        toolBar.add(prepareAddCardButton());
 
         return toolBar;
     }
 
-    private Component createContent() {
+    private Component prepareWordFilter(){
+        localWordFilter.setPlaceholder("find by word ...");
+        localWordFilter.setClearButtonVisible(true);
+        localWordFilter.setValueChangeMode(TIMEOUT);
+        localWordFilter.setValueChangeTimeout(2000);
+        localWordFilter.addValueChangeListener(this::onWordChanged);
+        return localWordFilter;
+    }
+
+    private void onWordChanged(AbstractField.ComponentValueChangeEvent<TextField, String> event) {
+        updateList();
+    }
+
+    private Component prepareFrequencyFilter() {
+        repetitionFrequencyFilter.setItems(RepetitionFrequency.values());
+        repetitionFrequencyFilter.setValue(DAILY);
+        repetitionFrequencyFilter.addValueChangeListener(this::onRepetitionFrequencyChange);
+        return repetitionFrequencyFilter;
+    }
+
+    private void onRepetitionFrequencyChange(
+            AbstractField.ComponentValueChangeEvent<ComboBox<RepetitionFrequency>, RepetitionFrequency> event) {
+
+        updateList();
+    }
+
+    private Component prepareAddCardButton(){
+        addCardButton.addClickListener(event -> addCard());
+        return addCardButton;
+    }
+
+    private Component prepareContent() {
 
         this.cardsGrid = createCardsGrid();
         this.cardForm = createCardForm();
@@ -89,22 +125,20 @@ public class CardsList extends VerticalLayout {
     private Grid<Card> createCardsGrid() {
 
         Grid<Card> cardsGrid = new Grid<>(Card.class);
-
         cardsGrid.addClassName("card-grid-class");
-        //cardsGrid.setSizeFull();
 
         cardsGrid.setColumns("localWord", "languageCode", "repetitionFrequency");
-
-        //cardsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
-
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
+
+        cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        cardsGrid.setPageSize(DEFAULT_PAGE_SIZE);
 
         return cardsGrid;
     }
 
     private CardForm createCardForm() {
 
-        CardForm cardForm = new CardForm(LANGUAGE_CODES, REPETITION_FREQUENCIES);
+        CardForm cardForm = new CardForm();
 
         cardForm.addSaveListener(this::saveCard);
         cardForm.addDeleteListener(this::deleteCard);
@@ -119,7 +153,6 @@ public class CardsList extends VerticalLayout {
     }
 
     private void saveCard(CardFormEvent.CardFormSaveEvent event){
-
         cardService.save(event.getCard());
         updateList();
         closeEditor();
@@ -132,9 +165,18 @@ public class CardsList extends VerticalLayout {
     }
 
     private void updateList() {
-        cardsGrid.setItems(cardService.find(FOREIGN_LANGUAGE, localWordFilter.getValue()));}
+
+        RepetitionFrequency frequency = repetitionFrequencyFilter.getValue();
+        if(ALL.equals(frequency))
+            frequency = null;
+
+        String startsWith = localWordFilter.getValue();
+        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, startsWith);
+        cardsGrid.setItems(foundCards);
+    }
 
     private void editCard(Card card) {
+
         if(card == null){
             closeEditor();
         }

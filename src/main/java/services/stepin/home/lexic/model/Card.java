@@ -8,16 +8,13 @@ import java.util.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
-import static services.stepin.home.lexic.model.RepetitionFrequency.WEEKLY;
+import static services.stepin.home.lexic.model.RepetitionFrequency.DAILY;
 
 @Entity
 @Data
 public class Card {
 
     public enum Gender{MASCULINE, FEMININE, NEUTER}
-
-    public static final List<LanguageCode> LANGUAGE_CODES = Arrays.stream(LanguageCode.values()).toList();
-    public static final List<RepetitionFrequency> REPETITION_FREQUENCIES = Arrays.stream(RepetitionFrequency.values()).toList();
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -27,7 +24,7 @@ public class Card {
     private LanguageCode languageCode = DE;
 
     @Enumerated(EnumType.STRING)
-    private RepetitionFrequency repetitionFrequency = WEEKLY;
+    private RepetitionFrequency repetitionFrequency = DAILY;
 
     @Enumerated(EnumType.STRING)
     private PartOfSpeechType partOfSpeech;
@@ -36,6 +33,7 @@ public class Card {
     private Gender gender;
 
     private String localWord;
+
     private String foreignWord;
 
     @ElementCollection(fetch = FetchType.EAGER)

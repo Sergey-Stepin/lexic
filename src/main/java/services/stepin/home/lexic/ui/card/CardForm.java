@@ -28,11 +28,13 @@ import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeech;
 import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.vaadin.flow.component.KeyModifier.CONTROL;
 import static services.stepin.home.lexic.model.Card.Gender.*;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
-import static services.stepin.home.lexic.model.RepetitionFrequency.DAYLY;
+import static services.stepin.home.lexic.model.RepetitionFrequency.ALL;
+import static services.stepin.home.lexic.model.RepetitionFrequency.DAILY;
 import static services.stepin.home.lexic.ui.CardsList.FOREIGN_LANGUAGE;
 import static services.stepin.home.lexic.ui.CardsList.LOCAL_LANGUAGE;
 import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
@@ -48,10 +50,6 @@ public class CardForm extends FormLayout {
     private final EnumMap<ModeType, Mode> modeMap = new EnumMap<>(ModeType.class);
     private final EnumMap<PartOfSpeechType, PartOfSpeech> partsOfSpeechMap = new EnumMap<>(PartOfSpeechType.class);
 
-    @Getter
-    private final List<LanguageCode> languageCodes;
-    @Getter
-    private final List<RepetitionFrequency> repetitionFrequencies;
     @Getter
     private final Button saveButton = new Button("Save");
     @Getter
@@ -94,25 +92,26 @@ public class CardForm extends FormLayout {
 
     private Card card;
 
-    public CardForm(
-            List<LanguageCode> languageCodes,
-            List<RepetitionFrequency> repetitionFrequencies) {
-
-        this.languageCodes = languageCodes;
-        this.repetitionFrequencies = repetitionFrequencies;
+    public CardForm() {
 
         addClassName("card-form-class");
 
-        languageCode.setItems(languageCodes);
-        repetitionFrequency.setItems(repetitionFrequencies);
+        languageCode.setItems(LanguageCode.values());
+        repetitionFrequency.setItems(getRepetitionFrequencies());
 
         languageCode.setValue(DE);
-        repetitionFrequency.setValue(DAYLY);
+        repetitionFrequency.setValue(DAILY);
 
         addLayout();
 
         cardBinder.bindInstanceFields(this);
 
+    }
+
+    private List<RepetitionFrequency> getRepetitionFrequencies(){
+        return Stream.of(RepetitionFrequency.values())
+                .filter(frequency -> !ALL.equals(frequency))
+                .toList();
     }
 
     private void addLayout() {

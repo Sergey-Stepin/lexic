@@ -2,7 +2,8 @@ package services.stepin.home.lexic.model;
 
 public enum RepetitionFrequency {
 
-    DAYLY,
+    ALL,
+    DAILY,
     WEEKLY,
     MONTHLY,
     NEVER

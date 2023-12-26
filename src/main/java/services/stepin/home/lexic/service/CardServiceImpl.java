@@ -9,6 +9,8 @@ import services.stepin.home.lexic.repository.CardRepository;
 
 import java.util.List;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService{
@@ -33,7 +35,15 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String startsWith) {
-        return null;
+
+        if(repetitionFrequency != null && hasText(startsWith))
+            return cardRepository.findByRepetitionFrequencyAndLocalWordStartsWith(repetitionFrequency, startsWith);
+        else if(repetitionFrequency != null)
+            return cardRepository.findByRepetitionFrequency(repetitionFrequency);
+        else if(hasText(startsWith))
+            return cardRepository.findByLocalWordStartsWith(startsWith);
+        else
+            return cardRepository.findAll();
     }
 
     @Override
