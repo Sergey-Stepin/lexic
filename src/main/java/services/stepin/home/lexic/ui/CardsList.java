@@ -110,7 +110,6 @@ public class CardsList extends VerticalLayout {
         cardForm.addDeleteListener(this::deleteCard);
         cardForm.addCloseListener(event -> closeEditor());
 
-
         return cardForm;
     }
 

@@ -1,5 +1,6 @@
 package services.stepin.home.lexic.ui.card;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -9,50 +10,80 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import lombok.Getter;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.Phrase;
 import services.stepin.home.lexic.model.RepetitionFrequency;
+import services.stepin.home.lexic.ui.card.strategy.mode.CheckForeignMode;
+import services.stepin.home.lexic.ui.card.strategy.mode.EditMode;
+import services.stepin.home.lexic.ui.card.strategy.mode.Mode;
+import services.stepin.home.lexic.ui.card.strategy.mode.ModeType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.RepetitionFrequency.DAYLY;
 import static services.stepin.home.lexic.ui.CardsList.FOREIGN_LANGUAGE;
 import static services.stepin.home.lexic.ui.CardsList.LOCAL_LANGUAGE;
 import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
+import static services.stepin.home.lexic.ui.card.strategy.mode.ModeType.*;
 
 public class CardForm extends FormLayout {
 
     private static final String LOCAL_EXAMPLE_LABEL = "Example (" + LOCAL_LANGUAGE + "):";
     private static final String FOREIGN_EXAMPLE_LABEL = "Example (" + FOREIGN_LANGUAGE + "):";
-
-    private final List<LanguageCode> languageCodes;
-    private final List<RepetitionFrequency> repetitionFrequencies;
     private final Binder<Card> cardBinder = new BeanValidationBinder<>(Card.class);
-    private final Button save = new Button("Save");
-    private final Button delete = new Button("Delete");
-    private final Button cancel = new Button("Cancel");
+
+    private final Map<ModeType, Mode> modes = new HashMap<>();
+
+    @Getter
+    private final List<LanguageCode> languageCodes;
+    @Getter
+    private final List<RepetitionFrequency> repetitionFrequencies;
+    @Getter
+    private final Button saveButton = new Button("Save");
+    @Getter
+    private final Button deleteButton = new Button("Delete");
+    @Getter
+    private final Button cancelButton = new Button("Cancel");
+    @Getter
+    private final RadioButtonGroup<ModeType> modesGroup = new RadioButtonGroup<>();
+    @Getter
     private final ComboBox<LanguageCode> languageCode = new ComboBox<>("Language");
+    @Getter
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
+    @Getter
     private final TextField localWord = new TextField("Local");
+    @Getter
     private final TextField foreignWord = new TextField("Foreign");
+    @Getter
     private final TextField localFirstExample = new TextField();
+    @Getter
     private final TextField localSecondExample = new TextField();
+    @Getter
     private final TextField localThirdExample = new TextField();
+    @Getter
     private final TextField foreignFirstExample = new TextField();
+    @Getter
     private final TextField foreignSecondExample = new TextField();
+    @Getter
     private final TextField foreignThirdExample = new TextField();
 
     private Card card;
 
-    public CardForm(List<LanguageCode> languageCodes, List<RepetitionFrequency> repetitionFrequencies) {
+    public CardForm(
+            List<LanguageCode> languageCodes,
+            List<RepetitionFrequency> repetitionFrequencies) {
 
         this.languageCodes = languageCodes;
         this.repetitionFrequencies = repetitionFrequencies;
@@ -68,6 +99,8 @@ public class CardForm extends FormLayout {
         repetitionFrequency.setValue(DAYLY);
 
         addLayout();
+
+        modesGroup.setValue(EDIT);
     }
 
     private void addLayout() {
@@ -96,21 +129,63 @@ public class CardForm extends FormLayout {
     }
 
     private Component createToolbar() {
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        save.addClickShortcut(Key.ENTER);
-        cancel.addClickShortcut(Key.ESCAPE);
+        saveButton.addClickShortcut(Key.ENTER);
+        cancelButton.addClickShortcut(Key.ESCAPE);
 
-        save.addClickListener(event -> validateAndSave());
-        delete.addClickListener(event -> fireEvent(new CardFormEvent.CardFormDeleteEvent(this, card)));
-        cancel.addClickListener(event -> fireEvent(new CardFormEvent.CardFormCloseEvent(this)));
+        saveButton.addClickListener(event -> validateAndSave());
+        deleteButton.addClickListener(event -> fireEvent(new CardFormEvent.CardFormDeleteEvent(this, card)));
+        cancelButton.addClickListener(event -> fireEvent(new CardFormEvent.CardFormCloseEvent(this)));
 
-        HorizontalLayout buttonLayout = new HorizontalLayout(save, delete, cancel);
+        Component modesGroup = createModesGroup();
+
+        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, deleteButton, cancelButton, modesGroup);
         add(buttonLayout);
 
         return buttonLayout;
+    }
+
+    private Component createModesGroup(){
+        modesGroup.setItems(
+                EDIT,
+                CHECK_FOREIGN,
+                CHECK_LOCAL);
+
+        modesGroup.setItemLabelGenerator(ModeType::getTitle);
+
+        add(modesGroup);
+
+        modesGroup.addValueChangeListener(this::onModeChanged);
+
+        return modesGroup;
+    }
+
+    private void onModeChanged(AbstractField.ComponentValueChangeEvent<RadioButtonGroup<ModeType>, ModeType> event) {
+        ModeType modeType = event.getValue();
+        setMode(modeType);
+    }
+
+    private void setMode(ModeType modeType){
+        Mode mode = loadMode(modeType);
+        mode.on();
+    }
+
+    private Mode loadMode(ModeType modeType) {
+
+        if(EDIT.equals(modeType))
+            return modes.computeIfAbsent(modeType, key -> new EditMode(this));
+
+        else if (CHECK_FOREIGN.equals(modeType))
+            return modes.computeIfAbsent(modeType, key -> new CheckForeignMode(this));
+
+        else if (CHECK_LOCAL.equals(modeType))
+            throw new UnsupportedOperationException("CHECK_LOCAL mode is not implemented yet");
+
+        else
+            throw  new IllegalArgumentException(" Unexpected mode type: " + modeType);
     }
 
     public void setCard(Card card) {
@@ -120,7 +195,14 @@ public class CardForm extends FormLayout {
         if(card != null)
             setExamples(card);
 
+        atoSetMode(card);
+
         cardBinder.readBean(card);
+    }
+
+    private void atoSetMode(Card card) {
+        if(card == null)
+            modesGroup.setValue(EDIT);
     }
 
     private void setExamples(Card card) {

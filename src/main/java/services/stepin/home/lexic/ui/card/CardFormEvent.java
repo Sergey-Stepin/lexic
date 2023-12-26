@@ -17,7 +17,6 @@ public abstract class CardFormEvent extends ComponentEvent<CardForm> {
         public CardFormDeleteEvent(CardForm cardForm, Card card) {
             super(cardForm, card);
         }
-
     }
 
     public static class CardFormCloseEvent extends CardFormEvent {

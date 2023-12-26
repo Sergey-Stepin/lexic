@@ -1,0 +1,6 @@
+- add strategy (interface) edit/local/foreign
+- add strategy (interface) part of speech
+- for noun: colours, plural
+- for verb: forms
+- add property: noun/adjective/verb ...
+- add localization (EN, RU, DE)
