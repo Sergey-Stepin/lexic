@@ -13,8 +13,6 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import elemental.json.impl.JsonUtil;
-import jdk.swing.interop.SwingInterOpUtils;
 import lombok.Getter;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
@@ -127,6 +125,8 @@ public class CardForm extends FormLayout {
         add(preparePartOfSpeechGroup());
         add(prepareGenderGroup());
 
+        setFonts();
+
         add(localWord);
         add(foreignWord);
         add(checkWord);
@@ -134,6 +134,15 @@ public class CardForm extends FormLayout {
         addExamples();
 
         setResponsiveSteps(new ResponsiveStep("0", 2));
+    }
+
+    private void setFonts() {
+
+        localWord.getStyle().set("font-size", "var(--lumo-font-size-xl)");
+
+        foreignWord.getStyle().set("font-size", "var(--lumo-font-size-xl)");
+
+        checkWord.getStyle().set("font-size", "var(--lumo-font-size-xl)");
     }
 
     private Component preparePartOfSpeechGroup() {
@@ -221,9 +230,6 @@ public class CardForm extends FormLayout {
 
         Card.Gender selectedGender = event.getValue();
 
-        if(card != null)
-            this.card.setGender(selectedGender);
-
         if (MASCULINE.equals(selectedGender))
             setForMasculin();
         else if (FEMININE.equals(selectedGender))
@@ -233,19 +239,21 @@ public class CardForm extends FormLayout {
     }
 
     private void setForMasculin() {
-        foreignFirstExample.getStyle().setBackground("green");
+        foreignWord.getStyle().setColor("mediumseagreen");
     }
 
     private void setForFeminine() {
-        foreignFirstExample.getStyle().setBackground("red");
+        foreignWord.getStyle().setColor("red");
     }
 
     private void setForNeuter() {
-        foreignFirstExample.getStyle().setBackground("blue");
+        foreignWord.getStyle().setColor("blue");
     }
 
 
     private void setAutocomplete() {
+        localWord.getElement().setAttribute("autocomplete", "off");
+        foreignWord.getElement().setAttribute("autocomplete", "off");
         checkWord.getElement().setAttribute("autocomplete", "off");
         checkFirstExample.getElement().setAttribute("autocomplete", "off");
         checkSecondExample.getElement().setAttribute("autocomplete", "off");
