@@ -7,8 +7,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -24,9 +24,14 @@ import java.util.List;
 
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.RepetitionFrequency.DAYLY;
+import static services.stepin.home.lexic.ui.CardsList.FOREIGN_LANGUAGE;
+import static services.stepin.home.lexic.ui.CardsList.LOCAL_LANGUAGE;
 import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
 
 public class CardForm extends FormLayout {
+
+    private static final String LOCAL_EXAMPLE_LABEL = "Example (" + LOCAL_LANGUAGE + "):";
+    private static final String FOREIGN_EXAMPLE_LABEL = "Example (" + FOREIGN_LANGUAGE + "):";
 
     private final List<LanguageCode> languageCodes;
     private final List<RepetitionFrequency> repetitionFrequencies;
@@ -67,20 +72,27 @@ public class CardForm extends FormLayout {
 
     private void addLayout() {
 
+        add(createToolbar());
+
         HorizontalLayout propertiesLayout = new HorizontalLayout(languageCode, repetitionFrequency);
-        //add(propertiesLayout);
+        add(propertiesLayout);
 
-        add(localWord, foreignWord);
+        add(localWord);
+        add(foreignWord);
 
-        //setResponsiveSteps(new ResponsiveStep("0", 1));
-    }
+        add(new Span(LOCAL_EXAMPLE_LABEL));
+        add(new Span(FOREIGN_EXAMPLE_LABEL));
 
-    private Component prepareExamplesPanel() {
-        HorizontalLayout exampleFirst = new HorizontalLayout(localFirstExample, foreignFirstExample);
-        HorizontalLayout exampleSecond = new HorizontalLayout(localSecondExample, foreignSecondExample);
-        HorizontalLayout exampleThird = new HorizontalLayout(localThirdExample, foreignThirdExample);
+        add(localFirstExample);
+        add(foreignFirstExample);
 
-        return new VerticalLayout(exampleFirst, exampleSecond, exampleThird);
+        add(localSecondExample);
+        add(foreignSecondExample);
+
+        add(localThirdExample);
+        add(foreignThirdExample);
+
+        setResponsiveSteps(new ResponsiveStep("0", 2));
     }
 
     private Component createToolbar() {

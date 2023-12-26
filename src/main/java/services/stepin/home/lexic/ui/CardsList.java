@@ -20,6 +20,7 @@ import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static services.stepin.home.lexic.model.Card.LANGUAGE_CODES;
 import static services.stepin.home.lexic.model.Card.REPETITION_FREQUENCIES;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
+import static services.stepin.home.lexic.model.LanguageCode.RU;
 
 @Route(value = "lexic")
 @PageTitle("Lexic | cards")
@@ -27,7 +28,8 @@ public class CardsList extends VerticalLayout {
 
     private final CardService cardService;
 
-    private final LanguageCode foreignLanguage = DE;
+    public static final LanguageCode FOREIGN_LANGUAGE = DE;
+    public static final LanguageCode LOCAL_LANGUAGE = RU;
     private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
     private final TextField localWordFilter = new TextField();;
 
@@ -72,8 +74,12 @@ public class CardsList extends VerticalLayout {
         HorizontalLayout contentLayout = new HorizontalLayout(cardsGrid, cardForm);
         contentLayout.addClassName("content-class");
 
+        cardsGrid.setMinWidth("300px");
         contentLayout.setFlexGrow(1, cardsGrid);
+
+        cardForm.setSizeFull();
         contentLayout.setFlexGrow(2, cardForm);
+
         contentLayout.setSizeFull();
 
         return contentLayout;
@@ -129,7 +135,7 @@ public class CardsList extends VerticalLayout {
     }
 
     private void updateList() {
-        cardsGrid.setItems(cardService.find(foreignLanguage, localWordFilter.getValue()));}
+        cardsGrid.setItems(cardService.find(FOREIGN_LANGUAGE, localWordFilter.getValue()));}
 
     private void editCard(Card card) {
         if(card == null){
