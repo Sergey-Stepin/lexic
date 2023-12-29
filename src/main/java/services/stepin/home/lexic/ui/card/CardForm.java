@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.vaadin.flow.component.KeyModifier.CONTROL;
+import static org.springframework.util.StringUtils.hasText;
 import static services.stepin.home.lexic.model.Card.Gender.*;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.RepetitionFrequency.ALL;
@@ -484,19 +485,25 @@ public class CardForm extends FormLayout {
         List<Phrase> phrases = new ArrayList<>();
 
         Phrase firstPhrase = createPhrase(localFirstExample.getValue(), foreignFirstExample.getValue());
-        phrases.add(firstPhrase);
+        if(firstPhrase != null)
+            phrases.add(firstPhrase);
 
         Phrase secondPhrase = createPhrase(localSecondExample.getValue(), foreignSecondExample.getValue());
-        phrases.add(secondPhrase);
+        if(secondPhrase != null)
+            phrases.add(secondPhrase);
 
         Phrase thirdPhrase = createPhrase(localThirdExample.getValue(), foreignThirdExample.getValue());
-        phrases.add(thirdPhrase);
+        if(firstPhrase != null)
+            phrases.add(thirdPhrase);
 
         card.setPhraseList(phrases);
     }
 
-    private Phrase createPhrase(String local, String foreign) {
-        return new Phrase(languageCode.getValue(), local, foreign);
+    private Phrase createPhrase(String localWord, String foreignWord) {
+        if(hasText(localWord) && hasText(foreignWord))
+            return new Phrase(languageCode.getValue(), localWord, foreignWord);
+        else
+            return null;
     }
 
     public Registration addDeleteListener(ComponentEventListener<CardFormDeleteEvent> listener) {

@@ -1,18 +1,16 @@
 server:
   port: 9090
 
-logging:
-  level:
-    sql: DEBUG
-
 spring:
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create
-    show-sql: false
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:drone_database
-    username: sa
-    password:
+    test-while-idle: true
+    validation-query: "SELECT 1"
+    url: jdbc:postgresql://localhost:5432/lexic
+    username: lexic
+    password: lexic
