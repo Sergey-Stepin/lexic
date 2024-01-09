@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldBase;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -68,6 +69,8 @@ public class CardForm extends FormLayout {
     @Getter
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
     @Getter
+    private final GermanLetters germanLetters = new GermanLetters();
+    @Getter
     private final TextField localWord = new TextField("Local");
     @Getter
     private final TextField foreignWord = new TextField("Foreign");
@@ -85,13 +88,18 @@ public class CardForm extends FormLayout {
     private final TextField foreignSecondExample = new TextField();
     @Getter
     private final TextField checkSecondExample = new TextField();
+    @Getter
     private final TextField localThirdExample = new TextField();
     @Getter
     private final TextField foreignThirdExample = new TextField();
     @Getter
     private final TextField checkThirdExample = new TextField();
 
+    @Getter
+    private TextFieldBase<? extends TextFieldBase<?, String>, String> focusedComponent;
+
     private Card card;
+
 
     public CardForm() {
 
@@ -118,11 +126,12 @@ public class CardForm extends FormLayout {
     private void addLayout() {
 
         add(createToolbar());
+        add(germanLetters);
 
-        HorizontalLayout propertiesLayout = new HorizontalLayout(languageCode, repetitionFrequency);
-        add(propertiesLayout);
-
+        add(createModesGroup());
         add(preparePartOfSpeechGroup());
+
+        add(preparePropertiesToolbar());
         add(prepareGenderGroup());
 
         setFonts();
@@ -134,6 +143,8 @@ public class CardForm extends FormLayout {
         addExamples();
 
         setResponsiveSteps(new ResponsiveStep("0", 2));
+
+        addFocusTextFieldListeners();
     }
 
     private void setFonts() {
@@ -143,6 +154,10 @@ public class CardForm extends FormLayout {
         foreignWord.getStyle().set("font-size", "var(--lumo-font-size-xl)");
 
         checkWord.getStyle().set("font-size", "var(--lumo-font-size-xl)");
+    }
+
+    private Component preparePropertiesToolbar() {
+        return new HorizontalLayout(languageCode, repetitionFrequency);
     }
 
     private Component preparePartOfSpeechGroup() {
@@ -184,6 +199,30 @@ public class CardForm extends FormLayout {
 
         setAutocomplete();
         setExampleToolTips();
+
+    }
+
+    private void addFocusTextFieldListeners() {
+        localWord.addFocusListener(this::onFocus);
+        foreignWord.addFocusListener(this::onFocus);
+        checkWord.addFocusListener(this::onFocus);
+        localFirstExample.addFocusListener(this::onFocus);
+        foreignFirstExample.addFocusListener(this::onFocus);
+        checkFirstExample.addFocusListener(this::onFocus);
+        localSecondExample.addFocusListener(this::onFocus);
+        foreignSecondExample.addFocusListener(this::onFocus);
+        checkSecondExample.addFocusListener(this::onFocus);
+        localThirdExample.addFocusListener(this::onFocus);
+        foreignThirdExample.addFocusListener(this::onFocus);
+        checkThirdExample.addFocusListener(this::onFocus);
+    }
+
+    private void onFocus(FocusNotifier.FocusEvent<TextField> event) {
+
+        if(germanLetters.getSource() == null)
+            germanLetters.setSource(this);
+
+        focusedComponent = event.getSource();
     }
 
     private String generatePartOfSpeechLabel(PartOfSpeechType partOfSpeechType) {
@@ -327,9 +366,7 @@ public class CardForm extends FormLayout {
         deleteButton.addClickListener(event -> fireEvent(new CardFormEvent.CardFormDeleteEvent(this, card)));
         cancelButton.addClickListener(event -> fireEvent(new CardFormEvent.CardFormCloseEvent(this)));
 
-        Component modesGroup = createModesGroup();
-
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, deleteButton, cancelButton, modesGroup);
+        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, deleteButton, cancelButton);
         add(buttonLayout);
 
         return buttonLayout;
