@@ -27,6 +27,7 @@ import services.stepin.home.lexic.ui.card.strategy.speech.Noun;
 import services.stepin.home.lexic.ui.card.strategy.speech.OtherPartOfSpeech;
 import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeech;
 import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
+import services.stepin.home.lexic.ui.card.strategy.speech.Verb;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -251,7 +252,7 @@ public class CardForm extends FormLayout {
             return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new Noun(this));
 
         else if (VERB.equals(partOfSpeechType))
-            throw new UnsupportedOperationException("Verb as part of speech is not implemented yet");
+            return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new Verb(this));
 
         else if (OTHER.equals(partOfSpeechType))
             return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new OtherPartOfSpeech(this));
