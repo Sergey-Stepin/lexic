@@ -15,6 +15,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.Phrase;
@@ -44,6 +45,7 @@ import static services.stepin.home.lexic.ui.card.CardFormEvent.*;
 import static services.stepin.home.lexic.ui.card.strategy.mode.ModeType.*;
 import static services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType.*;
 
+@Log4j2
 public class CardForm extends FormLayout {
 
     private static final String LOCAL_EXAMPLE_LABEL = "Example (" + LOCAL_LANGUAGE + "):";
@@ -439,8 +441,8 @@ public class CardForm extends FormLayout {
             cardBinder.writeBean(card);
             fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
 
-        } catch (ValidationException e) {
-            throw new RuntimeException(e);
+        } catch (ValidationException ex) {
+            log.warn("Cannot save card: " + ex.getMessage());
         }
     }
 

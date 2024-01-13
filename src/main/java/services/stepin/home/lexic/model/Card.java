@@ -2,6 +2,7 @@ package services.stepin.home.lexic.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
 
@@ -34,8 +35,10 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @NotEmpty
     private String localWord;
 
+    @NotEmpty
     private String foreignWord;
 
     @ElementCollection(fetch = FetchType.EAGER)
