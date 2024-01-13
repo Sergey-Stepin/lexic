@@ -1,5 +1,6 @@
 package services.stepin.home.lexic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,6 +23,7 @@ public class Phrase {
     private String foreignPhrase;
 
     @Transient
+    @JsonIgnore
     private String phraseExam;
 
     public Phrase(LanguageCode languageCode, String localPhrase, String foreignPhrase) {

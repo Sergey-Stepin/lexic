@@ -115,7 +115,6 @@ public class CardForm extends FormLayout {
         addLayout();
 
         cardBinder.bindInstanceFields(this);
-
     }
 
     private List<RepetitionFrequency> getRepetitionFrequencies(){
@@ -258,7 +257,7 @@ public class CardForm extends FormLayout {
             return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new OtherPartOfSpeech(this));
 
         else
-            throw new IllegalArgumentException(" Unexpected part of speech: " + partOfSpeechType);
+            return partsOfSpeechMap.computeIfAbsent(partOfSpeechType, key -> new OtherPartOfSpeech(this));
     }
 
     private String generateGenderLabel(Card.Gender genderItem) {
@@ -429,6 +428,23 @@ public class CardForm extends FormLayout {
         cardBinder.readBean(card);
     }
 
+    public void validateAndSave() {
+
+        if(card == null){
+            return;
+        }
+
+        try {
+            setPhrases(card);
+            cardBinder.writeBean(card);
+            fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
+
+        } catch (ValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     private void setManuallyBoundField(){
         setExamples();
         setPartOfSpeech();
@@ -504,18 +520,6 @@ public class CardForm extends FormLayout {
 
         card.setLocalThirdExample(phrase.getLocalPhrase());
         card.setForeignThirdExample(phrase.getForeignPhrase());
-    }
-
-    private void validateAndSave() {
-
-        try {
-            setPhrases(card);
-            cardBinder.writeBean(card);
-            fireEvent(new CardFormEvent.CardFormSaveEvent(this, card));
-
-        } catch (ValidationException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void setPhrases(Card card) {

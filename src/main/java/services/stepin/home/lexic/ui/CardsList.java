@@ -1,6 +1,7 @@
 package services.stepin.home.lexic.ui;
 
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -14,12 +15,12 @@ import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
 import services.stepin.home.lexic.service.CardService;
+import services.stepin.home.lexic.service.ExportService;
 import services.stepin.home.lexic.ui.card.CardFormEvent;
 import services.stepin.home.lexic.ui.card.CardForm;
 
 import java.util.List;
 
-import static com.vaadin.flow.data.value.ValueChangeMode.LAZY;
 import static com.vaadin.flow.data.value.ValueChangeMode.TIMEOUT;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
 import static services.stepin.home.lexic.model.LanguageCode.RU;
@@ -34,19 +35,22 @@ public class CardsList extends VerticalLayout {
     public static final LanguageCode LOCAL_LANGUAGE = RU;
     private static final int DEFAULT_PAGE_SIZE = 100;
 
-
     private final CardService cardService;
+    private final ExportService exportService;
 
     private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
     private final TextField localWordFilter = new TextField();;
     private final Button addCardButton = new Button("Add card");
+    private final Button exportButton = new Button("Export");
 
     private Grid<Card> cardsGrid;
     private CardForm cardForm;
 
-    public CardsList(CardService cardService) {
+    public CardsList(
+            CardService cardService, ExportService exportService) {
 
         this.cardService = cardService;
+        this.exportService = exportService;
 
         addClassName("cards-class");
         setSizeFull();
@@ -67,6 +71,7 @@ public class CardsList extends VerticalLayout {
         toolBar.add(prepareWordFilter());
         toolBar.add(prepareFrequencyFilter());
         toolBar.add(prepareAddCardButton());
+        toolBar.add(prepareExportButton());
 
         return toolBar;
     }
@@ -97,9 +102,14 @@ public class CardsList extends VerticalLayout {
         updateList();
     }
 
-    private Component prepareAddCardButton(){
+    private Button prepareAddCardButton(){
         addCardButton.addClickListener(event -> addCard());
         return addCardButton;
+    }
+
+    private Button prepareExportButton(){
+        exportButton.addClickListener(this::onExportButtonClicked);
+        return exportButton;
     }
 
     private Component prepareContent() {
@@ -133,6 +143,8 @@ public class CardsList extends VerticalLayout {
         cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         cardsGrid.setPageSize(DEFAULT_PAGE_SIZE);
 
+        cardsGrid.setSizeFull();
+
         return cardsGrid;
     }
 
@@ -148,6 +160,11 @@ public class CardsList extends VerticalLayout {
     }
 
     private void addCard() {
+
+        if(cardForm != null){
+            cardForm.validateAndSave();
+        }
+
         cardsGrid.asSingleSelect().clear();
         editCard(new Card());
     }
@@ -192,4 +209,9 @@ public class CardsList extends VerticalLayout {
         cardForm.setVisible(false);
         removeClassName("editing-class");
     }
+
+    private void onExportButtonClicked(ClickEvent<Button> event) {
+        exportService.exportAll();
+    }
+
 }

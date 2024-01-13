@@ -1,5 +1,6 @@
 package services.stepin.home.lexic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import services.stepin.home.lexic.ui.card.strategy.speech.PartOfSpeechType;
@@ -27,7 +28,8 @@ public class Card {
     private RepetitionFrequency repetitionFrequency = DAILY;
 
     @Enumerated(EnumType.STRING)
-    private PartOfSpeechType partOfSpeech;
+    @Column(nullable = false)
+    private PartOfSpeechType partOfSpeech = PartOfSpeechType.OTHER;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -44,21 +46,27 @@ public class Card {
     private List<Phrase> phraseList = new ArrayList<>();
 
     @Transient
+    @JsonIgnore
     private String localFirstExample;
 
     @Transient
+    @JsonIgnore
     private String localSecondExample;
 
     @Transient
+    @JsonIgnore
     private String localThirdExample;
 
     @Transient
+    @JsonIgnore
     private String foreignFirstExample;
 
     @Transient
+    @JsonIgnore
     private String foreignSecondExample;
 
     @Transient
+    @JsonIgnore
     private String foreignThirdExample;
 
 }
