@@ -39,7 +39,7 @@ public class CardsList extends VerticalLayout {
     private final ExportService exportService;
 
     private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
-    private final TextField localWordFilter = new TextField();;
+    private final TextField localWordFilter = new TextField();
     private final Button addCardButton = new Button("Add card");
     private final Button exportButton = new Button("Export");
 
