@@ -1,16 +1,17 @@
 FIX:
+- CHeck foreign -> Select a word -> Select another word -> colour remains
 - CHeck foreign -> Select a word -> Select another word -> Ctrl+C: wrong tooltip
-- can save empty word: check local ond foreign fields
 
 ADD:
-- export/import json
-- filtering: Daily/Weekly/Monthly ...
-- Save: Ctrl+S
+- noun: plural forms
 - CardList: Repeat again checkbox
+- filtering: Daily/Weekly/Monthly ...
 
 - for verb:
     forms of verb
 
+- export with date in the file name
+- import json
 - Arrows UP and DOWN to move along the list
 - Spelling check using AWS
 

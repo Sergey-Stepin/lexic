@@ -22,7 +22,7 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public Slice<Card> findAllByLanguageCode(LanguageCode languageCode, Pageable pageable) {
-        return cardRepository.findAllByLanguageCode(languageCode, pageable);
+        return cardRepository.findAllByLanguageCodeOrderByCardId(languageCode, pageable);
     }
 
     @Override
@@ -44,11 +44,11 @@ public class CardServiceImpl implements CardService{
     public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String startsWith) {
 
         if(repetitionFrequency != null && hasText(startsWith))
-            return cardRepository.findByRepetitionFrequencyAndLocalWordStartsWith(repetitionFrequency, startsWith);
+            return cardRepository.findByRepetitionFrequencyAndLocalWordStartsWithOrderByCardId(repetitionFrequency, startsWith);
         else if(repetitionFrequency != null)
-            return cardRepository.findByRepetitionFrequency(repetitionFrequency);
+            return cardRepository.findByRepetitionFrequencyOrderByCardId(repetitionFrequency);
         else if(hasText(startsWith))
-            return cardRepository.findByLocalWordStartsWith(startsWith);
+            return cardRepository.findByLocalWordStartsWithOrderByCardId(startsWith);
         else
             return cardRepository.findAll();
     }

@@ -50,6 +50,11 @@ public class CardForm extends FormLayout {
 
     private static final String LOCAL_EXAMPLE_LABEL = "Example (" + LOCAL_LANGUAGE + "):";
     private static final String FOREIGN_EXAMPLE_LABEL = "Example (" + FOREIGN_LANGUAGE + "):";
+
+    private static final String MASCULIN_COLOUR_NAME = "blue";
+    private static final String FEMININE_COLOUR_NAME = "red";
+    private static final String NEUTER_COLOUR_NAME = "mediumseagreen";
+    private static final String DEFAULT_COLOUR_NAME = "black";
     private final Binder<Card> cardBinder = new BeanValidationBinder<>(Card.class);
 
     private final EnumMap<ModeType, Mode> modeMap = new EnumMap<>(ModeType.class);
@@ -72,11 +77,10 @@ public class CardForm extends FormLayout {
     @Getter
     private final ComboBox<RepetitionFrequency> repetitionFrequency = new ComboBox<>("Repeat");
     @Getter
-    private final GermanLetters germanLetters = new GermanLetters();
-    @Getter
     private final TextField localWord = new TextField("Local");
     @Getter
     private final TextField foreignWord = new TextField("Foreign");
+    private final TextField foreignPlural = new TextField("Plural");
     @Getter
     private final TextField checkWord = new TextField("Check");
     @Getter
@@ -119,7 +123,7 @@ public class CardForm extends FormLayout {
         cardBinder.bindInstanceFields(this);
     }
 
-    private List<RepetitionFrequency> getRepetitionFrequencies(){
+    private List<RepetitionFrequency> getRepetitionFrequencies() {
         return Stream.of(RepetitionFrequency.values())
                 .filter(frequency -> !ALL.equals(frequency))
                 .toList();
@@ -128,7 +132,6 @@ public class CardForm extends FormLayout {
     private void addLayout() {
 
         add(createToolbar());
-        add(germanLetters);
 
         add(createModesGroup());
         add(preparePartOfSpeechGroup());
@@ -136,7 +139,7 @@ public class CardForm extends FormLayout {
         add(preparePropertiesToolbar());
         add(prepareGenderGroup());
 
-        setFonts();
+        add(foreignPlural);
 
         add(localWord);
         add(foreignWord);
@@ -144,9 +147,8 @@ public class CardForm extends FormLayout {
 
         addExamples();
 
+        setFonts();
         setResponsiveSteps(new ResponsiveStep("0", 2));
-
-        addFocusTextFieldListeners();
     }
 
     private void setFonts() {
@@ -204,29 +206,6 @@ public class CardForm extends FormLayout {
 
     }
 
-    private void addFocusTextFieldListeners() {
-        localWord.addFocusListener(this::onFocus);
-        foreignWord.addFocusListener(this::onFocus);
-        checkWord.addFocusListener(this::onFocus);
-        localFirstExample.addFocusListener(this::onFocus);
-        foreignFirstExample.addFocusListener(this::onFocus);
-        checkFirstExample.addFocusListener(this::onFocus);
-        localSecondExample.addFocusListener(this::onFocus);
-        foreignSecondExample.addFocusListener(this::onFocus);
-        checkSecondExample.addFocusListener(this::onFocus);
-        localThirdExample.addFocusListener(this::onFocus);
-        foreignThirdExample.addFocusListener(this::onFocus);
-        checkThirdExample.addFocusListener(this::onFocus);
-    }
-
-    private void onFocus(FocusNotifier.FocusEvent<TextField> event) {
-
-        if(germanLetters.getSource() == null)
-            germanLetters.setSource(this);
-
-        focusedComponent = event.getSource();
-    }
-
     private String generatePartOfSpeechLabel(PartOfSpeechType partOfSpeechType) {
         return partOfSpeechType.name().toLowerCase();
     }
@@ -236,7 +215,7 @@ public class CardForm extends FormLayout {
 
         PartOfSpeechType partOfSpeechType = event.getValue();
 
-        if(card == null)
+        if (card == null)
             return;
 
         setPartOfSpeechMap(partOfSpeechType);
@@ -277,18 +256,23 @@ public class CardForm extends FormLayout {
             setForFeminine();
         else if (NEUTER.equals(selectedGender))
             setForNeuter();
+        else
+            setForUndetermined();
     }
 
     private void setForMasculin() {
-        foreignWord.getStyle().setColor("mediumseagreen");
+        foreignWord.getStyle().setColor(MASCULIN_COLOUR_NAME);
     }
 
     private void setForFeminine() {
-        foreignWord.getStyle().setColor("red");
+        foreignWord.getStyle().setColor(FEMININE_COLOUR_NAME);
     }
 
     private void setForNeuter() {
-        foreignWord.getStyle().setColor("blue");
+        foreignWord.getStyle().setColor(NEUTER_COLOUR_NAME);
+    }
+    private void setForUndetermined() {
+        foreignWord.getStyle().setColor(DEFAULT_COLOUR_NAME);
     }
 
 
@@ -392,7 +376,7 @@ public class CardForm extends FormLayout {
     private void onModeChanged(AbstractField.ComponentValueChangeEvent<RadioButtonGroup<ModeType>, ModeType> event) {
         ModeType modeType = event.getValue();
 
-        if(card == null)
+        if (card == null)
             return;
 
         setMode(modeType);
@@ -432,7 +416,7 @@ public class CardForm extends FormLayout {
 
     public void validateAndSave() {
 
-        if(card == null){
+        if (card == null) {
             return;
         }
 
@@ -446,8 +430,7 @@ public class CardForm extends FormLayout {
         }
     }
 
-
-    private void setManuallyBoundField(){
+    private void setManuallyBoundField() {
         setExamples();
         setPartOfSpeech();
         setGender();
@@ -475,12 +458,12 @@ public class CardForm extends FormLayout {
         setThirdExample(phrases);
     }
 
-    private void setPartOfSpeech(){
+    private void setPartOfSpeech() {
         PartOfSpeechType storedValue = card.getPartOfSpeech();
         partOfSpeech.setValue(storedValue);
     }
 
-    private void setGender(){
+    private void setGender() {
         Card.Gender storedValue = card.getGender();
         gender.setValue(storedValue);
     }
@@ -529,22 +512,22 @@ public class CardForm extends FormLayout {
         List<Phrase> phrases = new ArrayList<>();
 
         Phrase firstPhrase = createPhrase(localFirstExample.getValue(), foreignFirstExample.getValue());
-        if(firstPhrase != null)
+        if (firstPhrase != null)
             phrases.add(firstPhrase);
 
         Phrase secondPhrase = createPhrase(localSecondExample.getValue(), foreignSecondExample.getValue());
-        if(secondPhrase != null)
+        if (secondPhrase != null)
             phrases.add(secondPhrase);
 
         Phrase thirdPhrase = createPhrase(localThirdExample.getValue(), foreignThirdExample.getValue());
-        if(firstPhrase != null)
+        if (firstPhrase != null)
             phrases.add(thirdPhrase);
 
         card.setPhraseList(phrases);
     }
 
     private Phrase createPhrase(String localWord, String foreignWord) {
-        if(hasText(localWord) && hasText(foreignWord))
+        if (hasText(localWord) && hasText(foreignWord))
             return new Phrase(languageCode.getValue(), localWord, foreignWord);
         else
             return null;

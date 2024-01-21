@@ -76,7 +76,7 @@ public class CardsList extends VerticalLayout {
         return toolBar;
     }
 
-    private Component prepareWordFilter(){
+    private Component prepareWordFilter() {
         localWordFilter.setPlaceholder("find by word ...");
         localWordFilter.setClearButtonVisible(true);
         localWordFilter.setValueChangeMode(TIMEOUT);
@@ -102,12 +102,12 @@ public class CardsList extends VerticalLayout {
         updateList();
     }
 
-    private Button prepareAddCardButton(){
+    private Button prepareAddCardButton() {
         addCardButton.addClickListener(event -> addCard());
         return addCardButton;
     }
 
-    private Button prepareExportButton(){
+    private Button prepareExportButton() {
         exportButton.addClickListener(this::onExportButtonClicked);
         return exportButton;
     }
@@ -120,11 +120,12 @@ public class CardsList extends VerticalLayout {
         HorizontalLayout contentLayout = new HorizontalLayout(cardsGrid, cardForm);
         contentLayout.addClassName("content-class");
 
-        cardsGrid.setMinWidth("300px");
-        contentLayout.setFlexGrow(1, cardsGrid);
+        cardsGrid.setSizeFull();
+        cardsGrid.setMinWidth("200px");
+        //contentLayout.setFlexGrow(1, cardsGrid);
 
-        cardForm.setSizeFull();
-        contentLayout.setFlexGrow(2, cardForm);
+        cardsGrid.setMinWidth("600px");
+        //contentLayout.setFlexGrow(3, cardForm);
 
         contentLayout.setSizeFull();
 
@@ -137,13 +138,11 @@ public class CardsList extends VerticalLayout {
         Grid<Card> cardsGrid = new Grid<>(Card.class);
         cardsGrid.addClassName("card-grid-class");
 
-        cardsGrid.setColumns("localWord", "languageCode", "repetitionFrequency");
+        cardsGrid.setColumns("localWord");
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
 
         cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         cardsGrid.setPageSize(DEFAULT_PAGE_SIZE);
-
-        cardsGrid.setSizeFull();
 
         return cardsGrid;
     }
@@ -161,7 +160,7 @@ public class CardsList extends VerticalLayout {
 
     private void addCard() {
 
-        if(cardForm != null){
+        if (cardForm != null) {
             cardForm.validateAndSave();
         }
 
@@ -169,7 +168,7 @@ public class CardsList extends VerticalLayout {
         editCard(new Card());
     }
 
-    private void saveCard(CardFormEvent.CardFormSaveEvent event){
+    private void saveCard(CardFormEvent.CardFormSaveEvent event) {
         cardService.save(event.getCard());
         updateList();
         closeEditor();
@@ -184,7 +183,7 @@ public class CardsList extends VerticalLayout {
     private void updateList() {
 
         RepetitionFrequency frequency = repetitionFrequencyFilter.getValue();
-        if(ALL.equals(frequency))
+        if (ALL.equals(frequency))
             frequency = null;
 
         String startsWith = localWordFilter.getValue();
@@ -194,7 +193,7 @@ public class CardsList extends VerticalLayout {
 
     private void editCard(Card card) {
 
-        if(card == null){
+        if (card == null) {
             closeEditor();
         }
 
