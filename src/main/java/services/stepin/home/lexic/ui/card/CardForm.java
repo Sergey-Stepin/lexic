@@ -102,9 +102,6 @@ public class CardForm extends FormLayout {
     @Getter
     private final TextField checkThirdExample = new TextField();
 
-    @Getter
-    private TextFieldBase<? extends TextFieldBase<?, String>, String> focusedComponent;
-
     private Card card;
 
 
