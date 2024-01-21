@@ -41,6 +41,8 @@ public class Card {
     @NotEmpty
     private String foreignWord;
 
+    private String foreignPlural;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> foreignWords;
 
