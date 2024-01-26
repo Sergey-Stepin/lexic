@@ -122,10 +122,8 @@ public class CardsList extends VerticalLayout {
 
         cardsGrid.setSizeFull();
         cardsGrid.setMinWidth("200px");
-        //contentLayout.setFlexGrow(1, cardsGrid);
 
-        cardsGrid.setMinWidth("600px");
-        //contentLayout.setFlexGrow(3, cardForm);
+        cardForm.setMinWidth("800px");
 
         contentLayout.setSizeFull();
 
