@@ -74,4 +74,39 @@ public class Card {
     @JsonIgnore
     private String foreignThirdExample;
 
+    @Transient
+    @JsonIgnore
+    private boolean again;
+
+    @Transient
+    @JsonIgnore
+    private int hash = 0;
+
+    @Transient
+    @JsonIgnore
+    private boolean isHashCalculated = false;
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Card card = (Card) o;
+
+        return cardId == card.cardId;
+    }
+
+    @Override
+    public int hashCode() {
+
+        if(isHashCalculated)
+            return hash;
+
+        hash = (int) (cardId ^ (cardId >>> 32));
+        isHashCalculated = true;
+
+        return hash;
+    }
 }

@@ -3,7 +3,6 @@ FIX:
 - CHeck foreign -> Select a word -> Select another word -> Ctrl+C: wrong tooltip
 
 ADD:
-- export with date in the file name
 - for verb: forms of verb
 - Arrows UP and DOWN to move along the list
 - CardList: Repeat again checkbox

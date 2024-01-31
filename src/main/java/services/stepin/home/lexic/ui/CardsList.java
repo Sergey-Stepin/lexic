@@ -4,6 +4,7 @@ import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -19,7 +20,9 @@ import services.stepin.home.lexic.service.ExportService;
 import services.stepin.home.lexic.ui.card.CardFormEvent;
 import services.stepin.home.lexic.ui.card.CardForm;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.vaadin.flow.data.value.ValueChangeMode.TIMEOUT;
 import static services.stepin.home.lexic.model.LanguageCode.DE;
@@ -38,13 +41,17 @@ public class CardsList extends VerticalLayout {
     private final CardService cardService;
     private final ExportService exportService;
 
-    private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
     private final TextField localWordFilter = new TextField();
+    private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
+
     private final Button addCardButton = new Button("Add card");
     private final Button exportButton = new Button("Export");
 
     private Grid<Card> cardsGrid;
     private CardForm cardForm;
+
+    private final Set<Card> checkAgainCards = new HashSet<>();
+    private final Checkbox checkAgainFilter = new Checkbox("again");
 
     public CardsList(
             CardService cardService, ExportService exportService) {
@@ -69,6 +76,7 @@ public class CardsList extends VerticalLayout {
         toolBar.addClassName("toolbar-class");
 
         toolBar.add(prepareWordFilter());
+        toolBar.add(prepareAgainFilter());
         toolBar.add(prepareFrequencyFilter());
         toolBar.add(prepareAddCardButton());
         toolBar.add(prepareExportButton());
@@ -81,25 +89,21 @@ public class CardsList extends VerticalLayout {
         localWordFilter.setClearButtonVisible(true);
         localWordFilter.setValueChangeMode(TIMEOUT);
         localWordFilter.setValueChangeTimeout(2000);
-        localWordFilter.addValueChangeListener(this::onWordChanged);
+        localWordFilter.addValueChangeListener(event -> updateList());
         return localWordFilter;
     }
 
-    private void onWordChanged(AbstractField.ComponentValueChangeEvent<TextField, String> event) {
-        updateList();
+    private Component prepareAgainFilter() {
+        checkAgainFilter.setValue(false);
+        checkAgainFilter.addValueChangeListener(event -> updateList());
+        return checkAgainFilter;
     }
 
     private Component prepareFrequencyFilter() {
         repetitionFrequencyFilter.setItems(RepetitionFrequency.values());
         repetitionFrequencyFilter.setValue(DAILY);
-        repetitionFrequencyFilter.addValueChangeListener(this::onRepetitionFrequencyChange);
+        repetitionFrequencyFilter.addValueChangeListener(event -> updateList());
         return repetitionFrequencyFilter;
-    }
-
-    private void onRepetitionFrequencyChange(
-            AbstractField.ComponentValueChangeEvent<ComboBox<RepetitionFrequency>, RepetitionFrequency> event) {
-
-        updateList();
     }
 
     private Button prepareAddCardButton() {
@@ -137,12 +141,32 @@ public class CardsList extends VerticalLayout {
         cardsGrid.addClassName("card-grid-class");
 
         cardsGrid.setColumns("localWord");
+        Grid.Column<Card> checkAgainColumn = cardsGrid.addComponentColumn(this::generateCheckAgainComponent);
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
 
         cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         cardsGrid.setPageSize(DEFAULT_PAGE_SIZE);
 
         return cardsGrid;
+    }
+
+    private Component generateCheckAgainComponent(Card card) {
+
+        boolean checkAgain = checkAgainCards.contains(card);
+        Checkbox againCheckBox = new Checkbox(checkAgain);
+        againCheckBox.addValueChangeListener(event ->  onAgainCheckBocChange(event, card));
+
+        return againCheckBox;
+    }
+
+    private void onAgainCheckBocChange(AbstractField.ComponentValueChangeEvent<Checkbox, Boolean> event, Card card) {
+
+        boolean checkAgain = event.getValue();
+
+        if(checkAgain)
+            checkAgainCards.add(card);
+        else
+            checkAgainCards.remove(card);
     }
 
     private CardForm createCardForm() {
@@ -185,8 +209,28 @@ public class CardsList extends VerticalLayout {
             frequency = null;
 
         String startsWith = localWordFilter.getValue();
-        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, startsWith);
+
+        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, startsWith)
+                .stream()
+                .filter(this::applyAgainFilter)
+                .peek(this::markAgain)
+                .toList();
+
         cardsGrid.setItems(foundCards);
+    }
+
+    private void markAgain(Card card) {
+
+        if(checkAgainCards.contains(card))
+            card.setAgain(true);
+    }
+
+    private boolean applyAgainFilter(Card card) {
+
+        if(!checkAgainFilter.getValue())
+            return true;
+
+        return checkAgainCards.contains(card);
     }
 
     private void editCard(Card card) {
