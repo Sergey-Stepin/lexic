@@ -3,16 +3,10 @@ FIX:
 - CHeck foreign -> Select a word -> Select another word -> Ctrl+C: wrong tooltip
 
 ADD:
-- noun: plural forms
-- CardList: Repeat again checkbox
-- filtering: Daily/Weekly/Monthly ...
-
-- for verb:
-    forms of verb
-
 - export with date in the file name
-- import json
+- for verb: forms of verb
 - Arrows UP and DOWN to move along the list
-- Spelling check using AWS
+- CardList: Repeat again checkbox
 
-- add localization (EN, RU, DE)
+- import json
+- Spelling check using AWS

@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -30,9 +32,20 @@ import static services.stepin.home.lexic.model.LanguageCode.DE;
 @Log4j2
 public class ExportServiceImpl implements ExportService {
 
-    public static final int BATCH_SIZE = 3;
+    public static final int BATCH_SIZE = 50;
 
-    private static final String PATH = "lexic.json";
+    private static final String PATH = "";
+    private static final String NAME = "lexic";
+    private static final String EXTENSION = "json";
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final String FILE_NAME
+            = PATH
+            + NAME
+            + "_"
+            + DATE_TIME_FORMATTER.format(LocalDate.now())
+            + "." + EXTENSION;
+
     private final CardService cardService;
     private final ObjectMapper objectMapper;
 
@@ -40,20 +53,15 @@ public class ExportServiceImpl implements ExportService {
     public void exportAll() {
 
         long numberOfExported = 0;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             numberOfExported += exportForLanguage(DE, writer);
 
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
-        String message = format("The dictionary of %d words was successfully exported to a file: %s",
-                numberOfExported,
-                PATH);
-
-        Notification.show(message, 5_000, TOP_CENTER);
-
-        check();
+        notifyExport(numberOfExported);
+        //check();
     }
 
     private long exportForLanguage(LanguageCode languageCode, BufferedWriter writer) {
@@ -106,7 +114,7 @@ public class ExportServiceImpl implements ExportService {
 
     private void check() {
 
-        Path path = Paths.get(PATH);
+        Path path = Paths.get(FILE_NAME);
         try (Stream<String> lines = Files.lines(path)) {
 
             lines.map(this::mapToCard)
@@ -129,4 +137,11 @@ public class ExportServiceImpl implements ExportService {
         System.out.println(card);
     }
 
+    private void notifyExport(long numberOfExported) {
+        String message = format("The dictionary of %d words was successfully exported to a file: %s",
+                numberOfExported,
+                FILE_NAME);
+
+        Notification.show(message, 5_000, TOP_CENTER);
+    }
 }
