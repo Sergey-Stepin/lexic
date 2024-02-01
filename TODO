@@ -5,7 +5,8 @@ FIX:
 ADD:
 - for verb: forms of verb
 - Arrows UP and DOWN to move along the list
-- CardList: Repeat again checkbox
+- alignment for again checkbox
+- border for checkbox and clear button
 
 - import json
 - Spelling check using AWS

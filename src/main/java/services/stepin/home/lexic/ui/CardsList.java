@@ -7,11 +7,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
@@ -52,6 +54,7 @@ public class CardsList extends VerticalLayout {
 
     private final Set<Card> checkAgainCards = new HashSet<>();
     private final Checkbox checkAgainFilter = new Checkbox("again");
+    private final Button clearRepeatAgainButton = new Button("Clear");
 
     public CardsList(
             CardService cardService, ExportService exportService) {
@@ -76,7 +79,7 @@ public class CardsList extends VerticalLayout {
         toolBar.addClassName("toolbar-class");
 
         toolBar.add(prepareWordFilter());
-        toolBar.add(prepareAgainFilter());
+        toolBar.add(prepareRepeatAgainToolbar());
         toolBar.add(prepareFrequencyFilter());
         toolBar.add(prepareAddCardButton());
         toolBar.add(prepareExportButton());
@@ -93,10 +96,36 @@ public class CardsList extends VerticalLayout {
         return localWordFilter;
     }
 
-    private Component prepareAgainFilter() {
+    private Component prepareRepeatAgainToolbar() {
+
+        HorizontalLayout repeatAgainToolbar = new HorizontalLayout();
+        repeatAgainToolbar.addClassNames(
+                LumoUtility.Padding.Vertical.NONE,
+                LumoUtility.Padding.Horizontal.NONE,
+                LumoUtility.Margin.NONE);
+
+        repeatAgainToolbar.setAlignItems(Alignment.BASELINE);
+
+        repeatAgainToolbar.getStyle().set("border-width", "thin");
+        repeatAgainToolbar.getStyle().set("border-style", "solid");
+        repeatAgainToolbar.getStyle().set("border-color", "var(--lumo-contrast-20pct)");
+        repeatAgainToolbar.getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+
+        repeatAgainToolbar.add(prepareCheckAgainFilter());
+        repeatAgainToolbar.add(prepareClearRepeatAgainButton());
+
+        return repeatAgainToolbar;
+    }
+
+    private Component prepareCheckAgainFilter(){
         checkAgainFilter.setValue(false);
         checkAgainFilter.addValueChangeListener(event -> updateList());
         return checkAgainFilter;
+    }
+
+    private Component prepareClearRepeatAgainButton() {
+        clearRepeatAgainButton.addClickListener(event -> clearRepeatAgain());
+        return clearRepeatAgainButton;
     }
 
     private Component prepareFrequencyFilter() {
@@ -165,12 +194,18 @@ public class CardsList extends VerticalLayout {
 
         boolean checkAgain = checkAgainCards.contains(card);
         Checkbox againCheckBox = new Checkbox(checkAgain);
-        againCheckBox.addValueChangeListener(event ->  onAgainCheckBocChange(event, card));
+        againCheckBox.addValueChangeListener(event ->  onAgainCheckboxChange(event, card));
 
         return againCheckBox;
     }
 
-    private void onAgainCheckBocChange(AbstractField.ComponentValueChangeEvent<Checkbox, Boolean> event, Card card) {
+    private void clearRepeatAgain() {
+        checkAgainCards.clear();
+        checkAgainFilter.setValue(false);
+        updateList();
+    }
+
+    private void onAgainCheckboxChange(AbstractField.ComponentValueChangeEvent<Checkbox, Boolean> event, Card card) {
 
         boolean checkAgain = event.getValue();
 
