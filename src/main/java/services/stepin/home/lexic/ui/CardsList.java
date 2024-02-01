@@ -141,7 +141,18 @@ public class CardsList extends VerticalLayout {
         cardsGrid.addClassName("card-grid-class");
 
         cardsGrid.setColumns("localWord");
-        Grid.Column<Card> checkAgainColumn = cardsGrid.addComponentColumn(this::generateCheckAgainComponent);
+
+        Grid.Column<Card> checkAgainColumn = cardsGrid
+                .addComponentColumn(this::generateCheckAgainComponent)
+                .setHeader("Again")
+                .setKey("again")
+                .setWidth("70px")
+                .setFlexGrow(0);
+
+        cardsGrid.setColumnOrder(
+                cardsGrid.getColumnByKey("again"),
+                cardsGrid.getColumnByKey("localWord"));
+
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
 
         cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
