@@ -16,7 +16,7 @@ import static services.stepin.home.lexic.model.RepetitionFrequency.DAILY;
 @Data
 public class Card {
 
-    public enum Gender{MASCULINE, FEMININE, NEUTER}
+    public enum Gender{MASKULINUM, FEMININUM, NEUTRUM}
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -42,6 +42,9 @@ public class Card {
     private String foreignWord;
 
     private String foreignPlural;
+
+    private String imperativeDu;
+    private String imperativeIhr;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> foreignWords;

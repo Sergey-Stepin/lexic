@@ -3,10 +3,6 @@ FIX:
 - CHeck foreign -> Select a word -> Select another word -> Ctrl+C: wrong tooltip
 
 ADD:
-- for verb: forms of verb
-- Arrows UP and DOWN to move along the list
-- alignment for again checkbox
-- border for checkbox and clear button
 
 - import json
 - Spelling check using AWS

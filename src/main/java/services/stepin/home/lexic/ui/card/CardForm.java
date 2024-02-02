@@ -9,7 +9,6 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldBase;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -51,9 +50,9 @@ public class CardForm extends FormLayout {
     private static final String LOCAL_EXAMPLE_LABEL = "Example (" + LOCAL_LANGUAGE + "):";
     private static final String FOREIGN_EXAMPLE_LABEL = "Example (" + FOREIGN_LANGUAGE + "):";
 
-    private static final String MASCULIN_COLOUR_NAME = "blue";
-    private static final String FEMININE_COLOUR_NAME = "red";
-    private static final String NEUTER_COLOUR_NAME = "mediumseagreen";
+    private static final String MASCULINUM_COLOUR_NAME = "blue";
+    private static final String FEMININUM_COLOUR_NAME = "red";
+    private static final String NEUTRUM_COLOUR_NAME = "mediumseagreen";
     private static final String DEFAULT_COLOUR_NAME = "black";
     private final Binder<Card> cardBinder = new BeanValidationBinder<>(Card.class);
 
@@ -80,7 +79,12 @@ public class CardForm extends FormLayout {
     private final TextField localWord = new TextField("Local");
     @Getter
     private final TextField foreignWord = new TextField("Foreign");
+    @Getter
     private final TextField foreignPlural = new TextField("Plural");
+    @Getter
+    private final TextField imperativeDu = new TextField("Imperativ (du)");
+    @Getter
+    private final TextField imperativeIhr = new TextField("Imperativ (ihr)");
     @Getter
     private final TextField checkWord = new TextField("Check");
     @Getter
@@ -136,7 +140,8 @@ public class CardForm extends FormLayout {
         add(preparePropertiesToolbar());
         add(prepareGenderGroup());
 
-        add(foreignPlural);
+        //add(foreignPlural);
+        add(partOfSpeechDependentComponent());
 
         add(localWord);
         add(foreignWord);
@@ -171,7 +176,17 @@ public class CardForm extends FormLayout {
         partOfSpeech.addValueChangeListener(this::onPartOfSpeechChangedChanged);
 
         return partOfSpeech;
+    }
 
+    private Component partOfSpeechDependentComponent() {
+
+        HorizontalLayout partOfSpeechDependent = new HorizontalLayout();
+
+        partOfSpeechDependent.add(foreignPlural);
+        partOfSpeechDependent.add(imperativeDu);
+        partOfSpeechDependent.add(imperativeIhr);
+
+        return partOfSpeechDependent;
     }
 
     private Component prepareGenderGroup() {
@@ -247,26 +262,26 @@ public class CardForm extends FormLayout {
 
         Card.Gender selectedGender = event.getValue();
 
-        if (MASCULINE.equals(selectedGender))
-            setForMasculin();
-        else if (FEMININE.equals(selectedGender))
-            setForFeminine();
-        else if (NEUTER.equals(selectedGender))
-            setForNeuter();
+        if (MASKULINUM.equals(selectedGender))
+            setForMasculinum();
+        else if (FEMININUM.equals(selectedGender))
+            setForFemininum();
+        else if (NEUTRUM.equals(selectedGender))
+            setForNeutrum();
         else
             setForUndetermined();
     }
 
-    private void setForMasculin() {
-        foreignWord.getStyle().setColor(MASCULIN_COLOUR_NAME);
+    private void setForMasculinum() {
+        foreignWord.getStyle().setColor(MASCULINUM_COLOUR_NAME);
     }
 
-    private void setForFeminine() {
-        foreignWord.getStyle().setColor(FEMININE_COLOUR_NAME);
+    private void setForFemininum() {
+        foreignWord.getStyle().setColor(FEMININUM_COLOUR_NAME);
     }
 
-    private void setForNeuter() {
-        foreignWord.getStyle().setColor(NEUTER_COLOUR_NAME);
+    private void setForNeutrum() {
+        foreignWord.getStyle().setColor(NEUTRUM_COLOUR_NAME);
     }
     private void setForUndetermined() {
         foreignWord.getStyle().setColor(DEFAULT_COLOUR_NAME);
