@@ -1,7 +1,6 @@
 package services.stepin.home.lexic.ui.dataprovider;
 
 import lombok.Data;
-import lombok.Setter;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;

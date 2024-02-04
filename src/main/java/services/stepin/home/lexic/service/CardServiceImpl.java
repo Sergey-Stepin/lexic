@@ -1,7 +1,6 @@
 package services.stepin.home.lexic.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -10,8 +9,6 @@ import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
 import services.stepin.home.lexic.repository.CardRepository;
 import services.stepin.home.lexic.ui.dataprovider.CardFilter;
-
-import java.util.List;
 
 import static org.springframework.util.StringUtils.hasText;
 

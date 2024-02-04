@@ -1,15 +1,11 @@
 package services.stepin.home.lexic.service;
 
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
-import services.stepin.home.lexic.model.RepetitionFrequency;
 import services.stepin.home.lexic.ui.dataprovider.CardFilter;
-
-import java.util.List;
 
 @Service
 public interface CardService {

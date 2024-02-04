@@ -8,8 +8,6 @@ import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
 
-import java.util.List;
-
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
 
