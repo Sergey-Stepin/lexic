@@ -13,11 +13,11 @@ import java.util.List;
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    List<Card> findByRepetitionFrequencyAndLocalWordStartsWithOrderByCardId(RepetitionFrequency repetitionFrequency, String startsWith);
+    List<Card> findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(RepetitionFrequency repetitionFrequency, String contains);
 
     List<Card> findByRepetitionFrequencyOrderByCardId(RepetitionFrequency repetitionFrequency);
 
-    List<Card> findByLocalWordStartsWithOrderByCardId(String startsWith);
+    List<Card> findByLocalWordContainsOrderByCardId(String contains);
 
     Slice<Card> findAllByLanguageCodeOrderByCardId(LanguageCode languageCode, Pageable pageable);
 

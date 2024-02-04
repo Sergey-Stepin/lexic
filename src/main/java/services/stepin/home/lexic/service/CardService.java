@@ -18,9 +18,9 @@ public interface CardService {
 
     List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency);
 
-    List<Card> find(LanguageCode languageCode, String startsWith);
+    List<Card> find(LanguageCode languageCode, String contains);
 
-    List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String startsWith);
+    List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String contains);
 
     Card save(Card card);
 

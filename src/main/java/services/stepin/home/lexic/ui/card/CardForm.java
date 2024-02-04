@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
@@ -84,7 +85,9 @@ public class CardForm extends FormLayout {
     @Getter
     private final TextField imperativeDu = new TextField("Imperativ (du)");
     @Getter
-    private final TextField imperativeIhr = new TextField("Imperativ (ihr)");
+    private final TextField indikativIhr = new TextField("Indikativ (ihr)");
+    @Getter
+    private final TextField indikativErSieEs = new TextField("Indikativ (er/sie/es)");
     @Getter
     private final TextField checkWord = new TextField("Check");
     @Getter
@@ -138,10 +141,9 @@ public class CardForm extends FormLayout {
         add(preparePartOfSpeechGroup());
 
         add(preparePropertiesToolbar());
-        add(prepareGenderGroup());
+        add(prepareNounComponent());
 
-        //add(foreignPlural);
-        add(partOfSpeechDependentComponent());
+        add(prepareVerbComponent());
 
         add(localWord);
         add(foreignWord);
@@ -178,22 +180,30 @@ public class CardForm extends FormLayout {
         return partOfSpeech;
     }
 
-    private Component partOfSpeechDependentComponent() {
+    private Component prepareVerbComponent() {
 
         HorizontalLayout partOfSpeechDependent = new HorizontalLayout();
 
-        partOfSpeechDependent.add(foreignPlural);
         partOfSpeechDependent.add(imperativeDu);
-        partOfSpeechDependent.add(imperativeIhr);
+        partOfSpeechDependent.add(indikativIhr);
+        partOfSpeechDependent.add(indikativErSieEs);
 
         return partOfSpeechDependent;
     }
 
-    private Component prepareGenderGroup() {
+    private Component prepareNounComponent() {
+
+        HorizontalLayout nounComponent = new HorizontalLayout();
+        nounComponent.setAlignItems(FlexComponent.Alignment.BASELINE);
+
         gender.setItems(Card.Gender.values());
         gender.setItemLabelGenerator(this::generateGenderLabel);
         gender.addValueChangeListener(this::onGenderChanged);
-        return gender;
+        nounComponent.add(gender);
+
+        nounComponent.add(foreignPlural);
+
+        return nounComponent;
     }
 
     private void addExamples() {
@@ -262,11 +272,11 @@ public class CardForm extends FormLayout {
 
         Card.Gender selectedGender = event.getValue();
 
-        if (MASKULINUM.equals(selectedGender))
+        if (MASCULINE.equals(selectedGender))
             setForMasculinum();
-        else if (FEMININUM.equals(selectedGender))
+        else if (FEMININE.equals(selectedGender))
             setForFemininum();
-        else if (NEUTRUM.equals(selectedGender))
+        else if (NEUTER.equals(selectedGender))
             setForNeutrum();
         else
             setForUndetermined();

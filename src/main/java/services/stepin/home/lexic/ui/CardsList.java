@@ -253,9 +253,9 @@ public class CardsList extends VerticalLayout {
         if (ALL.equals(frequency))
             frequency = null;
 
-        String startsWith = localWordFilter.getValue();
+        String contains = localWordFilter.getValue();
 
-        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, startsWith)
+        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, contains)
                 .stream()
                 .filter(this::applyAgainFilter)
                 .peek(this::markAgain)

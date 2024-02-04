@@ -36,19 +36,19 @@ public class CardServiceImpl implements CardService{
     }
 
     @Override
-    public List<Card> find(LanguageCode languageCode, String startsWith) {
+    public List<Card> find(LanguageCode languageCode, String contains) {
         return cardRepository.findAll();
     }
 
     @Override
-    public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String startsWith) {
+    public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String contains) {
 
-        if(repetitionFrequency != null && hasText(startsWith))
-            return cardRepository.findByRepetitionFrequencyAndLocalWordStartsWithOrderByCardId(repetitionFrequency, startsWith);
+        if(repetitionFrequency != null && hasText(contains))
+            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(repetitionFrequency, contains);
         else if(repetitionFrequency != null)
             return cardRepository.findByRepetitionFrequencyOrderByCardId(repetitionFrequency);
-        else if(hasText(startsWith))
-            return cardRepository.findByLocalWordStartsWithOrderByCardId(startsWith);
+        else if(hasText(contains))
+            return cardRepository.findByLocalWordContainsOrderByCardId(contains);
         else
             return cardRepository.findAll();
     }
