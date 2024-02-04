@@ -67,13 +67,13 @@ public class ExportServiceImpl implements ExportService {
     private long exportForLanguage(LanguageCode languageCode, BufferedWriter writer) {
 
         Pageable pageRequest = PageRequest.of(0, BATCH_SIZE);
-        Slice<Card> batch = cardService.findAllByLanguageCode(languageCode, pageRequest);
+        Slice<Card> batch = cardService.find(languageCode, pageRequest);
 
         long numberOfExported = export(batch.getContent(), writer);
 
         while (batch.hasNext()) {
             pageRequest = batch.nextPageable();
-            batch = cardService.findAllByLanguageCode(languageCode, pageRequest);
+            batch = cardService.find(languageCode, pageRequest);
 
             numberOfExported += export(batch.getContent(), writer);
         }

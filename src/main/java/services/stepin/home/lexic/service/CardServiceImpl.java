@@ -1,6 +1,7 @@
 package services.stepin.home.lexic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import services.stepin.home.lexic.model.Card;
 import services.stepin.home.lexic.model.LanguageCode;
 import services.stepin.home.lexic.model.RepetitionFrequency;
 import services.stepin.home.lexic.repository.CardRepository;
+import services.stepin.home.lexic.ui.dataprovider.CardFilter;
 
 import java.util.List;
 
@@ -21,36 +23,35 @@ public class CardServiceImpl implements CardService{
 
 
     @Override
-    public Slice<Card> findAllByLanguageCode(LanguageCode languageCode, Pageable pageable) {
+    public Slice<Card> find(LanguageCode languageCode, Pageable pageable) {
         return cardRepository.findAllByLanguageCodeOrderByCardId(languageCode, pageable);
     }
 
     @Override
-    public List<Card> find(LanguageCode languageCode) {
-        return null;
-    }
+    public Slice<Card> find(CardFilter filter, Pageable pageable) {
 
-    @Override
-    public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency) {
-        return null;
-    }
+        String localWordContains = filter.localWordContains();
+        RepetitionFrequency repetitionFrequency = filter.repetitionFrequency();
 
-    @Override
-    public List<Card> find(LanguageCode languageCode, String contains) {
-        return cardRepository.findAll();
-    }
+        if(repetitionFrequency != null && hasText(localWordContains))
+            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(
+                    repetitionFrequency,
+                    localWordContains,
+                    pageable);
 
-    @Override
-    public List<Card> find(LanguageCode languageCode, RepetitionFrequency repetitionFrequency, String contains) {
-
-        if(repetitionFrequency != null && hasText(contains))
-            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(repetitionFrequency, contains);
         else if(repetitionFrequency != null)
-            return cardRepository.findByRepetitionFrequencyOrderByCardId(repetitionFrequency);
-        else if(hasText(contains))
-            return cardRepository.findByLocalWordContainsOrderByCardId(contains);
+            return cardRepository.findByRepetitionFrequencyOrderByCardId(repetitionFrequency, pageable);
+
+        else if(hasText(localWordContains))
+            return cardRepository.findByLocalWordContainsOrderByCardId(localWordContains, pageable);
+
         else
-            return cardRepository.findAll();
+            return cardRepository.findAll(pageable);
+    }
+
+    @Override
+    public Slice<Card> findAll(Pageable pageable) {
+        return cardRepository.findAll(pageable);
     }
 
     @Override
@@ -63,5 +64,30 @@ public class CardServiceImpl implements CardService{
         cardRepository.delete(card);
     }
 
+    @Override
+    public long count() {
+        return cardRepository.count();
+    }
 
+    @Override
+    public long count(CardFilter filter) {
+
+        String localWordContains = filter.localWordContains();
+        RepetitionFrequency repetitionFrequency = filter.repetitionFrequency();
+
+        if(repetitionFrequency != null && hasText(localWordContains))
+            return cardRepository.countByRepetitionFrequencyAndLocalWordContainsOrderByCardId(
+                    repetitionFrequency,
+                    localWordContains);
+
+        else if(repetitionFrequency != null)
+            return cardRepository.countByRepetitionFrequencyOrderByCardId(repetitionFrequency);
+
+        else if(hasText(localWordContains))
+            return cardRepository.countByLocalWordContainsOrderByCardId(localWordContains);
+
+        else
+            return cardRepository.count();
+
+    }
 }

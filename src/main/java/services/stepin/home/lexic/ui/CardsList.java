@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -20,6 +21,8 @@ import services.stepin.home.lexic.service.CardService;
 import services.stepin.home.lexic.service.ExportService;
 import services.stepin.home.lexic.ui.card.CardFormEvent;
 import services.stepin.home.lexic.ui.card.CardForm;
+import services.stepin.home.lexic.ui.dataprovider.CardFilter;
+import services.stepin.home.lexic.ui.dataprovider.CardDataProvider;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +40,9 @@ public class CardsList extends VerticalLayout {
 
     public static final LanguageCode FOREIGN_LANGUAGE = DE;
     public static final LanguageCode LOCAL_LANGUAGE = RU;
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 50;
 
+    private final ConfigurableFilterDataProvider<Card, Void, CardFilter> filteredDataProvider;
     private final CardService cardService;
     private final ExportService exportService;
 
@@ -56,7 +60,11 @@ public class CardsList extends VerticalLayout {
     private final Button clearRepeatAgainButton = new Button("Clear");
 
     public CardsList(
-            CardService cardService, ExportService exportService) {
+            CardDataProvider dataProvider,
+            CardService cardService,
+            ExportService exportService) {
+
+        this.filteredDataProvider = dataProvider.withConfigurableFilter();
 
         this.cardService = cardService;
         this.exportService = exportService;
@@ -184,6 +192,8 @@ public class CardsList extends VerticalLayout {
         cardsGrid.asSingleSelect().addValueChangeListener(event -> editCard(event.getValue()));
 
         cardsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+
+        cardsGrid.setDataProvider(filteredDataProvider);
         cardsGrid.setPageSize(DEFAULT_PAGE_SIZE);
 
         return cardsGrid;
@@ -249,33 +259,18 @@ public class CardsList extends VerticalLayout {
 
     private void updateList() {
 
+        CardFilter cardFilter = createCardFilter();
+        filteredDataProvider.setFilter(cardFilter);
+    }
+
+    private CardFilter createCardFilter(){
         RepetitionFrequency frequency = repetitionFrequencyFilter.getValue();
         if (ALL.equals(frequency))
             frequency = null;
 
-        String contains = localWordFilter.getValue();
+        String localWordContains = localWordFilter.getValue();
 
-        List<Card> foundCards = cardService.find(FOREIGN_LANGUAGE, frequency, contains)
-                .stream()
-                .filter(this::applyAgainFilter)
-                .peek(this::markAgain)
-                .toList();
-
-        cardsGrid.setItems(foundCards);
-    }
-
-    private void markAgain(Card card) {
-
-        if(checkAgainCards.contains(card))
-            card.setAgain(true);
-    }
-
-    private boolean applyAgainFilter(Card card) {
-
-        if(!checkAgainFilter.getValue())
-            return true;
-
-        return checkAgainCards.contains(card);
+        return new CardFilter(FOREIGN_LANGUAGE, frequency, localWordContains, null);
     }
 
     private void editCard(Card card) {
