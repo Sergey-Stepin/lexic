@@ -30,8 +30,8 @@ public class CardServiceImpl implements CardService{
     @Override
     public Slice<Card> find(CardFilter filter, Pageable pageable) {
 
-        String localWordContains = filter.localWordContains();
-        RepetitionFrequency repetitionFrequency = filter.repetitionFrequency();
+        String localWordContains = filter.getLocalWordContains();
+        RepetitionFrequency repetitionFrequency = filter.getRepetitionFrequency();
 
         if(repetitionFrequency != null && hasText(localWordContains))
             return cardRepository.findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(
@@ -72,8 +72,8 @@ public class CardServiceImpl implements CardService{
     @Override
     public long count(CardFilter filter) {
 
-        String localWordContains = filter.localWordContains();
-        RepetitionFrequency repetitionFrequency = filter.repetitionFrequency();
+        String localWordContains = filter.getLocalWordContains();
+        RepetitionFrequency repetitionFrequency = filter.getRepetitionFrequency();
 
         if(repetitionFrequency != null && hasText(localWordContains))
             return cardRepository.countByRepetitionFrequencyAndLocalWordContainsOrderByCardId(

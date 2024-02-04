@@ -25,7 +25,6 @@ import services.stepin.home.lexic.ui.dataprovider.CardFilter;
 import services.stepin.home.lexic.ui.dataprovider.CardDataProvider;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static com.vaadin.flow.data.value.ValueChangeMode.TIMEOUT;
@@ -43,6 +42,7 @@ public class CardsList extends VerticalLayout {
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     private final ConfigurableFilterDataProvider<Card, Void, CardFilter> filteredDataProvider;
+    private final CardFilter cardFilter = new CardFilter();
     private final CardService cardService;
     private final ExportService exportService;
 
@@ -252,25 +252,44 @@ public class CardsList extends VerticalLayout {
     }
 
     private void deleteCard(CardFormEvent.CardFormDeleteEvent event) {
-        cardService.delete(event.getCard());
+
+        Card card = event.getCard();
+
+        cardService.delete(card);
+        checkAgainCards.remove(card);
+
         updateList();
         closeEditor();
     }
 
     private void updateList() {
 
-        CardFilter cardFilter = createCardFilter();
+        updateCardFilter();
         filteredDataProvider.setFilter(cardFilter);
     }
 
-    private CardFilter createCardFilter(){
+    private void updateCardFilter() {
+
+        updateRepetitionFrequencyFilter();
+        updateLocalWordContainsFilter();
+        updateCheckAgain();
+    }
+
+    private void updateRepetitionFrequencyFilter(){
         RepetitionFrequency frequency = repetitionFrequencyFilter.getValue();
         if (ALL.equals(frequency))
             frequency = null;
 
-        String localWordContains = localWordFilter.getValue();
+        cardFilter.setRepetitionFrequency(frequency);
+    }
 
-        return new CardFilter(FOREIGN_LANGUAGE, frequency, localWordContains, null);
+    private void updateLocalWordContainsFilter() {
+        cardFilter.setLocalWordContains(localWordFilter.getValue());
+    }
+
+    private void updateCheckAgain() {
+        cardFilter.setCheckAgain(checkAgainFilter.getValue());
+        cardFilter.setCheckAgainCards(checkAgainCards);
     }
 
     private void editCard(Card card) {
