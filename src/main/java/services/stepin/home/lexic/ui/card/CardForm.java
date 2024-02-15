@@ -185,8 +185,8 @@ public class CardForm extends FormLayout {
         HorizontalLayout partOfSpeechDependent = new HorizontalLayout();
 
         partOfSpeechDependent.add(imperativeDu);
-        partOfSpeechDependent.add(indikativIhr);
         partOfSpeechDependent.add(indikativErSieEs);
+        partOfSpeechDependent.add(indikativIhr);
 
         return partOfSpeechDependent;
     }

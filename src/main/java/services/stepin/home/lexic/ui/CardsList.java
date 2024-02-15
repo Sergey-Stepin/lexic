@@ -118,7 +118,6 @@ public class CardsList extends VerticalLayout {
         repeatAgainToolbar.getStyle().set("border-color", "var(--lumo-contrast-20pct)");
         repeatAgainToolbar.getStyle().set("border-radius", "var(--lumo-border-radius-l)");
 
-        repeatAgainToolbar.add(prepareCheckAgainFilter());
         repeatAgainToolbar.add(prepareClearRepeatAgainButton());
 
         return repeatAgainToolbar;
