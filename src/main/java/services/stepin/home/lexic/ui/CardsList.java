@@ -47,6 +47,7 @@ public class CardsList extends VerticalLayout {
     private final ExportService exportService;
 
     private final TextField localWordFilter = new TextField();
+    private final TextField foreignWordFilter = new TextField();
     private final ComboBox<RepetitionFrequency> repetitionFrequencyFilter = new ComboBox<>();
 
     private final Button addCardButton = new Button("Add card");
@@ -85,7 +86,8 @@ public class CardsList extends VerticalLayout {
         HorizontalLayout toolBar = new HorizontalLayout();
         toolBar.addClassName("toolbar-class");
 
-        toolBar.add(prepareWordFilter());
+        toolBar.add(prepareLocalWordFilter());
+        toolBar.add(prepareForeignWordFilter());
         toolBar.add(prepareRepeatAgainToolbar());
         toolBar.add(prepareFrequencyFilter());
         toolBar.add(prepareAddCardButton());
@@ -94,13 +96,22 @@ public class CardsList extends VerticalLayout {
         return toolBar;
     }
 
-    private Component prepareWordFilter() {
-        localWordFilter.setPlaceholder("find by word ...");
+    private Component prepareLocalWordFilter() {
+        localWordFilter.setPlaceholder("find by local word ...");
         localWordFilter.setClearButtonVisible(true);
         localWordFilter.setValueChangeMode(TIMEOUT);
         localWordFilter.setValueChangeTimeout(2000);
         localWordFilter.addValueChangeListener(event -> updateList());
         return localWordFilter;
+    }
+
+    private Component prepareForeignWordFilter() {
+        foreignWordFilter.setPlaceholder("find by foreign word ...");
+        foreignWordFilter.setClearButtonVisible(true);
+        foreignWordFilter.setValueChangeMode(TIMEOUT);
+        foreignWordFilter.setValueChangeTimeout(2000);
+        foreignWordFilter.addValueChangeListener(event -> updateList());
+        return foreignWordFilter;
     }
 
     private Component prepareRepeatAgainToolbar() {
@@ -268,9 +279,8 @@ public class CardsList extends VerticalLayout {
     }
 
     private void updateCardFilter() {
-
         updateRepetitionFrequencyFilter();
-        updateLocalWordContainsFilter();
+        updateWordContainsFilters();
         updateCheckAgain();
     }
 
@@ -282,8 +292,9 @@ public class CardsList extends VerticalLayout {
         cardFilter.setRepetitionFrequency(frequency);
     }
 
-    private void updateLocalWordContainsFilter() {
+    private void updateWordContainsFilters() {
         cardFilter.setLocalWordContains(localWordFilter.getValue());
+        cardFilter.setForeignWordContains(foreignWordFilter.getValue());
     }
 
     private void updateCheckAgain() {
@@ -312,5 +323,4 @@ public class CardsList extends VerticalLayout {
     private void onExportButtonClicked(ClickEvent<Button> event) {
         exportService.exportAll();
     }
-
 }
