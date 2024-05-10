@@ -19,55 +19,56 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 			RepetitionFrequency repetitionFrequency,
 			Pageable pageable);
 
-	Slice<Card> findByRepetitionFrequencyAndLocalWordContainsAndForeignWordContainsOrderByCardId(
+	Slice<Card> findByRepetitionFrequencyAndLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCaseOrderByCardId(
 			RepetitionFrequency repetitionFrequency,
 			String localWordContains,
 			String foreignWordContains,
 			Pageable pageable);
 
-	Slice<Card> findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(
+	Slice<Card> findByRepetitionFrequencyAndLocalWordContainsIgnoreCaseOrderByCardId(
 			RepetitionFrequency repetitionFrequency,
 			String localWordContains,
 			Pageable pageable);
 
-	Slice<Card> findByRepetitionFrequencyAndForeignWordContainsOrderByCardId(
+	Slice<Card> findByRepetitionFrequencyAndForeignWordContainsIgnoreCaseOrderByCardId(
 			RepetitionFrequency repetitionFrequency,
 			String foreignWordContains,
 			Pageable pageable);
 
-	Slice<Card> findByLocalWordContainsAndForeignWordContainsOrderByCardId(
+	Slice<Card> findByLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCaseOrderByCardId(
 			String localWordContains,
 			String foreignWordContains,
 			Pageable pageable);
 
-	Slice<Card> findByForeignWordContainsOrderByCardId(
+	Slice<Card> findByForeignWordContainsIgnoreCaseOrderByCardId(
 			String foreignWordContains,
 			Pageable pageable);
 
-	Slice<Card> findByLocalWordContainsOrderByCardId(
+	Slice<Card> findByLocalWordContainsIgnoreCaseOrderByCardId(
 			String localWordContains,
 			Pageable pageable);
 
-	long countByRepetitionFrequencyAndLocalWordContainsAndForeignWordContains(
+	long countByRepetitionFrequencyAndLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCase(
 			RepetitionFrequency repetitionFrequency,
 			String localWordContains,
 			String foreignWordContains);
 
-	long countByRepetitionFrequencyAndLocalWordContains(
+	long countByRepetitionFrequencyAndLocalWordContainsIgnoreCase(
 			RepetitionFrequency repetitionFrequency,
 			String localWordContains);
 
-	long countByRepetitionFrequencyAndForeignWordContains(
+	long countByRepetitionFrequencyAndForeignWordContainsIgnoreCase(
 			RepetitionFrequency repetitionFrequency,
 			String foreignWordContains);
 
-	long countByLocalWordContainsAndForeignWordContains(
+	long countByLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCase(
 			String localWordContains,
 			String foreignWordContains);
 
-	long countByForeignWordContains(String foreignWordContains);
+	long countByForeignWordContainsIgnoreCase(String foreignWordContains);
 
-	long countByLocalWordContains(String localWordContains);
+	long countByLocalWordContainsIgnoreCase(String localWordContains);
 
 	long countByRepetitionFrequency(RepetitionFrequency repetitionFrequency);
+
 }

@@ -31,32 +31,32 @@ public class CardServiceImpl implements CardService{
         RepetitionFrequency repetitionFrequency = filter.getRepetitionFrequency();
 
         if(repetitionFrequency != null && hasText(localWordContains) && hasText(foreignWordContains))
-            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsAndForeignWordContainsOrderByCardId(
+            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCaseOrderByCardId(
                     repetitionFrequency,
                     localWordContains,
                     foreignWordContains,
                     pageable);
         else if (repetitionFrequency != null && hasText(localWordContains))
-            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsOrderByCardId(
+            return cardRepository.findByRepetitionFrequencyAndLocalWordContainsIgnoreCaseOrderByCardId(
                     repetitionFrequency,
                     localWordContains,
                     pageable);
         else if (repetitionFrequency != null && hasText(foreignWordContains))
-            return cardRepository.findByRepetitionFrequencyAndForeignWordContainsOrderByCardId(
+            return cardRepository.findByRepetitionFrequencyAndForeignWordContainsIgnoreCaseOrderByCardId(
                     repetitionFrequency,
                     foreignWordContains,
                     pageable);
         else if(hasText(localWordContains) && hasText(foreignWordContains))
-            return cardRepository.findByLocalWordContainsAndForeignWordContainsOrderByCardId(
+            return cardRepository.findByLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCaseOrderByCardId(
                     localWordContains,
                     foreignWordContains,
                     pageable);
         else if(repetitionFrequency != null)
             return cardRepository.findByRepetitionFrequencyOrderByCardId(repetitionFrequency, pageable);
         else if(hasText(localWordContains))
-            return cardRepository.findByLocalWordContainsOrderByCardId(localWordContains, pageable);
+            return cardRepository.findByLocalWordContainsIgnoreCaseOrderByCardId(localWordContains, pageable);
         else if(hasText(foreignWordContains))
-            return cardRepository.findByForeignWordContainsOrderByCardId(foreignWordContains, pageable);
+            return cardRepository.findByForeignWordContainsIgnoreCaseOrderByCardId(foreignWordContains, pageable);
         else
             return cardRepository.findAll(pageable);
     }
@@ -89,28 +89,28 @@ public class CardServiceImpl implements CardService{
         RepetitionFrequency repetitionFrequency = filter.getRepetitionFrequency();
 
         if(repetitionFrequency != null && hasText(localWordContains) && hasText(foreignWordContains))
-            return cardRepository.countByRepetitionFrequencyAndLocalWordContainsAndForeignWordContains(
+            return cardRepository.countByRepetitionFrequencyAndLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCase(
                     repetitionFrequency,
                     localWordContains,
                     foreignWordContains);
         else if (repetitionFrequency != null && hasText(localWordContains))
-            return cardRepository.countByRepetitionFrequencyAndLocalWordContains(
+            return cardRepository.countByRepetitionFrequencyAndLocalWordContainsIgnoreCase(
                     repetitionFrequency,
                     localWordContains);
         else if (repetitionFrequency != null && hasText(foreignWordContains))
-            return cardRepository.countByRepetitionFrequencyAndForeignWordContains(
+            return cardRepository.countByRepetitionFrequencyAndForeignWordContainsIgnoreCase(
                     repetitionFrequency,
                     foreignWordContains);
         else if(hasText(localWordContains) && hasText(foreignWordContains))
-            return cardRepository.countByLocalWordContainsAndForeignWordContains(
+            return cardRepository.countByLocalWordContainsIgnoreCaseAndForeignWordContainsIgnoreCase(
                     localWordContains,
                     foreignWordContains);
         else if(repetitionFrequency != null)
             return cardRepository.countByRepetitionFrequency(repetitionFrequency);
         else if(hasText(localWordContains))
-            return cardRepository.countByLocalWordContains(localWordContains);
+            return cardRepository.countByLocalWordContainsIgnoreCase(localWordContains);
         else if(hasText(foreignWordContains))
-            return cardRepository.countByForeignWordContains(foreignWordContains);
+            return cardRepository.countByForeignWordContainsIgnoreCase(foreignWordContains);
         else
             return cardRepository.count();
     }
